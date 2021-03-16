@@ -13,5 +13,7 @@
         <file>list-1.png</file>
         <file>settings-3.png</file>
         <file>poweroff.png</file>
+        <file>collapse.png</file>
+        <file>expand.png</file>
     </qresource>
 </RCC>

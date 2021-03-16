@@ -20,6 +20,8 @@ public:
 private slots:
     void on_actionE_xit_triggered();
 
+    void on_action_Expand_all_triggered();
+
 private:
     Ui::MainWindow *ui;
     QString currentPath = "";

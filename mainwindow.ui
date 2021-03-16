@@ -67,6 +67,9 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionE_xit"/>
+   <addaction name="separator"/>
+   <addaction name="action_Expand_all"/>
+   <addaction name="action_Collapse_all"/>
   </widget>
   <action name="actionE_xit">
    <property name="icon">
@@ -78,11 +81,19 @@
    </property>
   </action>
   <action name="action_Expand_all">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/imgs/expand.png</normaloff>:/imgs/expand.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Expand all</string>
    </property>
   </action>
   <action name="action_Collapse_all">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/imgs/collapse.png</normaloff>:/imgs/collapse.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Collapse all</string>
    </property>
