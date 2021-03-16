@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/imgs">
+        <file>archive-1.png</file>
+        <file>archive-3.png</file>
+        <file>binoculars2.png</file>
+        <file>briefcase-4.png</file>
+        <file>can.png</file>
+        <file>database.png</file>
+        <file>folder-3.png</file>
+        <file>folder-4.png</file>
+        <file>folder-5.png</file>
+        <file>folder-12.png</file>
+        <file>list-1.png</file>
+        <file>settings-3.png</file>
+        <file>poweroff.png</file>
+    </qresource>
+</RCC>
