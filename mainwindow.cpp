@@ -3,6 +3,10 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QModelIndex>
+#include <QCloseEvent>
+#include <QSettings>
+#include <QRect>
+#include <QDesktopWidget>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -23,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->model_right->setRootPath(QDir::homePath());
     ui->treeRight->setModel(this->model_right);
     ui->treeRight->setRootIndex(this->model_right->index(QDir::homePath()));
+    this->readSettings();
 
 }
 
@@ -37,6 +42,47 @@ MainWindow::~MainWindow()
 void MainWindow::on_actionE_xit_triggered()
 {
     close();
+}
+
+/**
+ * @brief MainWindow::closeEvent Overrides the close event of this form.
+ * @param event
+ */
+void MainWindow::closeEvent(QCloseEvent *event) {
+    qDebug() << "Shutdown app...";
+    saveSettings();
+    event->accept();
+}
+
+/**
+ * @brief Write the settings of the form to the .conf file
+ */
+void MainWindow::saveSettings() {
+    QSettings settings("DenkaTech","Denka Commander");
+    settings.beginGroup("MainWindow");
+    qDebug() << "Accessing ini at : " << settings.fileName();
+    settings.setValue("form/geometry", saveGeometry());
+    settings.endGroup();
+}
+
+/**
+ * @brief MainWindow::readSettings Read configuration information from the .conf file
+ * @param all
+ */
+void MainWindow::readSettings() {
+    QSettings settings("DenkaTech","Denka Commander");
+    qDebug() << "Reading config values in " << settings.fileName();
+    settings.beginGroup("MainWindow");
+    const QByteArray geometry = settings.value("form/geometry", QByteArray()).toByteArray();
+    if (geometry.isEmpty()) {
+        // If we have no settings yet, make sure the window has a reasonable size
+        const QRect availableGeometry = QApplication::desktop()->availableGeometry(this);
+        resize(availableGeometry.width() / 3, availableGeometry.height() / 2);
+        move((availableGeometry.width() - width()) / 2, (availableGeometry.height() - height()) / 2);
+    } else {
+        restoreGeometry(geometry);
+    }
+    settings.endGroup();
 }
 
 /**
@@ -74,6 +120,9 @@ void MainWindow::on_actionCopy_directory_triggered()
         // Have we a selection there?
         if (rightIndex.isValid()) {
             QString rightPath = this->model_left->fileInfo(rightIndex).absoluteFilePath();
+            QFileInfo pathInfo(leftPath);
+            qDebug() << "WAZAAA" << pathInfo.baseName();
+
             // We are not on the same path huh?
             if (rightPath == leftPath) {
                 QMessageBox::warning(this, "Warning", "Source and target folders are the same!");
@@ -86,13 +135,35 @@ void MainWindow::on_actionCopy_directory_triggered()
             } else {
                 // Are we copying a file or a directory?
                 if (this->model_left->isDir(leftIndex)) {
-                    // Start copying
-                    qDebug() << leftPath << " -> " << rightPath;
-                    this->copyFolder(leftPath, rightPath);
+                    // Before starting the copy, we must make a directory in the target section,
+                    // caution we need to take the name of the root that we copy and give it to
+                    // the copy function.  Otherwise only the contents will be copied and not
+                    // create a subdirectory in the target!
+                    QString targetDir = rightPath + QDir::separator() + pathInfo.baseName();
+                    if (QFile::exists(targetDir)) {
+                        QMessageBox::StandardButton answer;
+                        answer = QMessageBox::warning(this, "Attention", "Folder exists in target, overwrite?", QMessageBox::Yes|QMessageBox::No);
+                        if (answer == QMessageBox::No) {
+                            return;
+                        }
+                    }
+                    this->copyFolder(leftPath, targetDir);
                     ui->statusbar->showMessage("Files copied to target directory!", 5000);
                 } else {
-                    // Must be a file
-                    QFile::copy()
+                    // Must be a file if we get here, get the base filename
+                    QFileInfo fi(leftPath);
+                    QString absPath = fi.baseName();
+                    QString targetPath = rightPath + QDir::separator() + absPath;
+                    qDebug() << leftPath << " -> " << rightPath << " --> " << absPath;
+                    if (QFile::exists(targetPath)) {
+                        QMessageBox::StandardButton answer;
+                        answer = QMessageBox::warning(this, "Attention", "File exists in target, overwrite?", QMessageBox::Yes|QMessageBox::No);
+                        if (answer == QMessageBox::No) {
+                            return;
+                        }
+                    }
+                    QFile::copy(leftPath, targetPath);
+                    ui->statusbar->showMessage("Files " + absPath + " has been copied to target directory!", 5000);
                 }
             }
         } else {
@@ -103,7 +174,6 @@ void MainWindow::on_actionCopy_directory_triggered()
         QMessageBox::information(this,"Info", "No selection on source!");
     }
 }
-
 
 /**
  * @brief Recursively copy folder from left to right panel

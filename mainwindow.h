@@ -29,5 +29,10 @@ private:
     QFileSystemModel *model_left;
     QFileSystemModel *model_right;
     void copyFolder(QString sourceFolder, QString destFolder);
+    void readSettings();
+    void saveSettings();
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
 };
 #endif // MAINWINDOW_H
