@@ -16,15 +16,11 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void copyFolder(QString sourceFolder, QString destFolder);
 
 private slots:
     void on_actionE_xit_triggered();
-
     void on_action_Expand_all_triggered();
-
     void on_action_Collapse_all_triggered();
-
     void on_actionCopy_directory_triggered();
 
 private:
@@ -32,5 +28,6 @@ private:
     QString currentPath = "";
     QFileSystemModel *model_left;
     QFileSystemModel *model_right;
+    void copyFolder(QString sourceFolder, QString destFolder);
 };
 #endif // MAINWINDOW_H
