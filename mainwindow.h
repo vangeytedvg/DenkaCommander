@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QString>
 #include <QFileSystemModel>
+#include <QProgressBar>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -31,6 +32,8 @@ private:
     void copyFolder(QString sourceFolder, QString destFolder);
     void readSettings();
     void saveSettings();
+    void setupAdditionalUI();
+    QProgressBar *statusProgress;
 
 protected:
     void closeEvent(QCloseEvent *event) override;

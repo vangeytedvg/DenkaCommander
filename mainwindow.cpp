@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     this->currentPath.clear();
     this->setWindowTitle("Denka Commander");
+    this->setupAdditionalUI();
     // Left side browser
     this->model_left = new QFileSystemModel();
     this->model_left->setRootPath(QDir::homePath());
@@ -34,6 +35,18 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+/**
+ * @brief MainWindow::setupAdditionalUI
+ */
+void MainWindow::setupAdditionalUI() {
+    // Add a progress bar to the statusbar...
+    statusProgress = new QProgressBar();
+    statusProgress->setMaximum(100);
+    statusProgress->setMaximumWidth(100);
+    ui->statusbar->addPermanentWidget(statusProgress);
+    statusProgress->setValue(0);
 }
 
 /**
@@ -90,7 +103,6 @@ void MainWindow::readSettings() {
  */
 void MainWindow::on_action_Expand_all_triggered()
 {
-
     QModelIndex qi = ui->treeLeft->currentIndex();
     ui->treeLeft->expandRecursively(qi, -1);
 }
@@ -184,6 +196,7 @@ void MainWindow::copyFolder(QString sourceFolder, QString destFolder)
 {
     // Get the directory on the left side
     QDir sourceDir(sourceFolder);
+
     if(!sourceDir.exists())
         return;
     // Directory on the right side (target)
@@ -194,13 +207,18 @@ void MainWindow::copyFolder(QString sourceFolder, QString destFolder)
     }
     // Get the files and copy them
     QStringList files = sourceDir.entryList(QDir::Files);
-    for(int i = 0; i< files.count(); i++)
+    qDebug() << "Nr of files " << files.count();
+    double maxFiles = (double)files.count();
+    for(int i = 0; i < files.count(); i++)
     {      
         QString srcName = sourceFolder + "/" + files[i];
         QString destName = destFolder + "/" + files[i];
         QFile::copy(srcName, destName);
         ui->statusbar->showMessage("Copying" + srcName + " to " + destName);
+        double res = ((double)i / maxFiles) * 100;
+        statusProgress->setValue(res);
         QCoreApplication::processEvents();
+
     }
     files.clear();
     // In case of a subdirectory, use recursion
@@ -211,4 +229,6 @@ void MainWindow::copyFolder(QString sourceFolder, QString destFolder)
         QString destName = destFolder + "/" + files[i];
         copyFolder(srcName, destName);
     }
+    statusProgress->setValue(0);
 }
+
