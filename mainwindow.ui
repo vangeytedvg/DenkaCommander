@@ -52,8 +52,16 @@
     <addaction name="action_Expand_all"/>
     <addaction name="action_Collapse_all"/>
    </widget>
+   <widget class="QMenu" name="menuActions">
+    <property name="title">
+     <string>Actions</string>
+    </property>
+    <addaction name="actionCopy_directory"/>
+    <addaction name="actionCopy_File"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Tree"/>
+   <addaction name="menuActions"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -70,6 +78,9 @@
    <addaction name="separator"/>
    <addaction name="action_Expand_all"/>
    <addaction name="action_Collapse_all"/>
+   <addaction name="separator"/>
+   <addaction name="actionCopy_directory"/>
+   <addaction name="actionCopy_File"/>
   </widget>
   <action name="actionE_xit">
    <property name="icon">
@@ -96,6 +107,30 @@
    </property>
    <property name="text">
     <string>&amp;Collapse all</string>
+   </property>
+  </action>
+  <action name="actionCopy_directory">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/imgs/folder-4.png</normaloff>:/imgs/folder-4.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy directory</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
+  <action name="actionCopy_File">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/imgs/list-1.png</normaloff>:/imgs/list-1.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy File</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F5</string>
    </property>
   </action>
  </widget>
