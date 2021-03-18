@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "folderutils.h"
 #include <QDebug>
 #include <QMessageBox>
 #include <QModelIndex>
@@ -170,10 +171,15 @@ void MainWindow::on_action_Collapse_all_triggered()
 void MainWindow::on_actionCopy_directory_triggered()
 {
     // First find out what is selected on the left side
+    FolderUtils fu;
+
     QModelIndex leftIndex = ui->treeLeft->currentIndex();
 
     QString leftPath = this->model_left->fileInfo(leftIndex).absoluteFilePath();
-
+    fu.setSourcePath(leftPath);
+    long nrOfFiles = fu.countFiles();
+    qDebug() << nrOfFiles << Qt::endl;
+    return;
     // Something selected on the left side?
     if (leftIndex.isValid()) {
         // Check the right side now...
