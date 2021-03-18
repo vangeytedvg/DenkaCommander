@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeRight->setModel(this->model_right);
     ui->treeRight->setRootIndex(this->model_right->index(QDir::homePath()));
     this->readSettings();
-
+    this->setActiveTreeview(NULL);
 }
 
 MainWindow::~MainWindow()
@@ -48,6 +48,31 @@ void MainWindow::setupAdditionalUI() {
     ui->statusbar->addPermanentWidget(statusProgress);
     statusProgress->setValue(0);
 }
+
+/**
+ * @brief MainWindow::ActiveTreeview
+ * Handle treeview selection (left or right)
+ * @return
+ */
+QTreeView *MainWindow::ActiveTreeview() const
+{
+    return m_ActiveTreeview;
+}
+
+/**
+ * @brief MainWindow::setActiveTreeview
+ * Tell the system what is the active treeview
+ * @param ActiveTreeview
+ */
+void MainWindow::setActiveTreeview(QTreeView *ActiveTreeview)
+{
+    m_ActiveTreeview = ActiveTreeview;
+//    if (m_ActiveTreeview) {
+//        This is how to get the name of an object
+//        qDebug() << m_ActiveTreeview->objectName();
+//    }
+}
+
 
 /**
  * @brief Quit the application
@@ -99,21 +124,24 @@ void MainWindow::readSettings() {
 }
 
 /**
- * @brief Get the index of the currently selected item and open the folder
+ * @brief Get the index of the currently selected item in the
+ * active treeview and open the folder
  */
 void MainWindow::on_action_Expand_all_triggered()
 {
-    QModelIndex qi = ui->treeLeft->currentIndex();
-    ui->treeLeft->expandRecursively(qi, -1);
+    // Find out who is the active treeview
+    QModelIndex qi = this->ActiveTreeview()->currentIndex();
+    this->ActiveTreeview()->expandRecursively(qi, -1);
 }
 
 /**
- * @brief Get the index of the currently selected item and close the folder
+ * @brief Get the index of the currently selected item
+ * in the active treeview and close the folder
  */
 void MainWindow::on_action_Collapse_all_triggered()
 {
-    QModelIndex qi = ui->treeLeft->currentIndex();
-    ui->treeLeft->collapse(qi);
+    QModelIndex qi = this->ActiveTreeview()->currentIndex();
+    this->ActiveTreeview()->collapse(qi);
 }
 
 /**
@@ -232,3 +260,31 @@ void MainWindow::copyFolder(QString sourceFolder, QString destFolder)
     statusProgress->setValue(0);
 }
 
+
+/**
+ * @brief MainWindow::on_treeLeft_clicked
+ * Track the fact that we entered the LEFT treeview and make that
+ * treeview the active one in m_ActiveTreeview
+ * @param index
+ */
+void MainWindow::on_treeLeft_clicked(const QModelIndex &index)
+{
+    if (index.isValid()) {
+        this->setActiveTreeview(ui->treeLeft);
+        qDebug() << this->m_ActiveTreeview->currentIndex();
+    }
+}
+
+/**
+ * @brief MainWindow::on_treeRight_clicked
+ * Track the fact that we entered the RIGHT treeview and make that
+ * treeview the active one in m_ActiveTreeview
+ * @param index
+ */
+void MainWindow::on_treeRight_clicked(const QModelIndex &index)
+{
+    if (index.isValid()) {
+        this->setActiveTreeview(ui->treeRight);
+        qDebug() << this->m_ActiveTreeview->currentIndex();
+    }
+}

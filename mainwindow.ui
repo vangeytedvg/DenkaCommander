@@ -57,7 +57,10 @@
      <string>Actions</string>
     </property>
     <addaction name="actionCopy_directory"/>
-    <addaction name="actionCopy_File"/>
+    <addaction name="actionRename"/>
+    <addaction name="actionMkdir"/>
+    <addaction name="actionDelete"/>
+    <addaction name="separator"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Tree"/>
@@ -80,7 +83,10 @@
    <addaction name="action_Collapse_all"/>
    <addaction name="separator"/>
    <addaction name="actionCopy_directory"/>
-   <addaction name="actionCopy_File"/>
+   <addaction name="actionRename"/>
+   <addaction name="actionMkdir"/>
+   <addaction name="separator"/>
+   <addaction name="actionDelete"/>
   </widget>
   <action name="actionE_xit">
    <property name="icon">
@@ -112,25 +118,61 @@
   <action name="actionCopy_directory">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/imgs/folder-4.png</normaloff>:/imgs/folder-4.png</iconset>
+     <normaloff>:/imgs/files.png</normaloff>:/imgs/files.png</iconset>
    </property>
    <property name="text">
-    <string>Copy directory</string>
+    <string>Copy</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy (F5)</string>
    </property>
    <property name="shortcut">
     <string>F5</string>
    </property>
   </action>
-  <action name="actionCopy_File">
+  <action name="actionRename">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/imgs/list-1.png</normaloff>:/imgs/list-1.png</iconset>
+     <normaloff>:/imgs/edit.png</normaloff>:/imgs/edit.png</iconset>
    </property>
    <property name="text">
-    <string>Copy File</string>
+    <string>Rename</string>
+   </property>
+   <property name="toolTip">
+    <string>Rename (F6)</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+F5</string>
+    <string>F6</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/imgs/folderrm.png</normaloff>:/imgs/folderrm.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete (Ctrl-Del)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Del</string>
+   </property>
+  </action>
+  <action name="actionMkdir">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/imgs/folder.png</normaloff>:/imgs/folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Mkdir</string>
+   </property>
+   <property name="toolTip">
+    <string>Make directory (F9)</string>
+   </property>
+   <property name="shortcut">
+    <string>F9</string>
    </property>
   </action>
  </widget>

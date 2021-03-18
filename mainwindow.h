@@ -5,6 +5,7 @@
 #include <QString>
 #include <QFileSystemModel>
 #include <QProgressBar>
+#include <QTreeView>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,11 +19,19 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+
+    QTreeView *ActiveTreeview() const;
+    void setActiveTreeview(QTreeView *ActiveTreeview);
+
 private slots:
     void on_actionE_xit_triggered();
     void on_action_Expand_all_triggered();
     void on_action_Collapse_all_triggered();
     void on_actionCopy_directory_triggered();
+
+    void on_treeLeft_clicked(const QModelIndex &index);
+
+    void on_treeRight_clicked(const QModelIndex &index);
 
 private:
     Ui::MainWindow *ui;
@@ -34,6 +43,8 @@ private:
     void saveSettings();
     void setupAdditionalUI();
     QProgressBar *statusProgress;
+    QTreeView *m_ActiveTreeview;
+    QString m_Tree;
 
 protected:
     void closeEvent(QCloseEvent *event) override;
