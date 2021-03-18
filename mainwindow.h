@@ -28,10 +28,9 @@ private slots:
     void on_action_Expand_all_triggered();
     void on_action_Collapse_all_triggered();
     void on_actionCopy_directory_triggered();
-
     void on_treeLeft_clicked(const QModelIndex &index);
-
     void on_treeRight_clicked(const QModelIndex &index);
+    //void on_rowChanged(const QItemSelection &a, const QItemSelection &b);
 
 private:
     Ui::MainWindow *ui;

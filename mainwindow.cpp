@@ -18,19 +18,39 @@ MainWindow::MainWindow(QWidget *parent)
     this->setupAdditionalUI();
     // Left side browser
     this->model_left = new QFileSystemModel();
-    this->model_left->setRootPath(QDir::homePath());
+    this->model_left->setRootPath(QDir::rootPath());
     ui->treeLeft->setModel(this->model_left);
-    ui->treeLeft->setRootIndex(this->model_left->index(QDir::homePath()));
+    ui->treeLeft->setRootIndex(this->model_left->index(QDir::rootPath()));
+    this->model_left->sort(0, Qt::AscendingOrder);
     // Nothing selected on the left!
     ui->treeLeft->setCurrentIndex(this->model_left->index(0));
     // Right side browser
     this->model_right = new QFileSystemModel();
     this->model_right->setRootPath(QDir::homePath());
     ui->treeRight->setModel(this->model_right);
+    this->model_right->sort(0, Qt::AscendingOrder);
     ui->treeRight->setRootIndex(this->model_right->index(QDir::homePath()));
     this->readSettings();
     this->setActiveTreeview(NULL);
+//    this->model_left->setFilter(QDir::AllDirs);
+
+    // Connect the selection changed signal and slot.
+    // Bizarre, when I named the slot on_row_changed I got a bizarre error message.
+    // When I renamed it to on_rowChanged, no problem anymore!!!
+//    connect(ui->treeLeft->selectionModel(),
+//            SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+//            this,
+//            SLOT(on_rowChanged(const QItemSelection&, const QItemSelection&)));
 }
+
+
+//void MainWindow::on_rowChanged(const QItemSelection &a, const QItemSelection &b){
+
+//    qDebug() << "KWAKAKAK" << a.indexes();
+
+//    int c = a.indexes().count();
+//    qDebug() << c;
+//}
 
 MainWindow::~MainWindow()
 {
@@ -151,6 +171,7 @@ void MainWindow::on_actionCopy_directory_triggered()
 {
     // First find out what is selected on the left side
     QModelIndex leftIndex = ui->treeLeft->currentIndex();
+
     QString leftPath = this->model_left->fileInfo(leftIndex).absoluteFilePath();
 
     // Something selected on the left side?
@@ -260,7 +281,6 @@ void MainWindow::copyFolder(QString sourceFolder, QString destFolder)
     statusProgress->setValue(0);
 }
 
-
 /**
  * @brief MainWindow::on_treeLeft_clicked
  * Track the fact that we entered the LEFT treeview and make that
@@ -271,7 +291,6 @@ void MainWindow::on_treeLeft_clicked(const QModelIndex &index)
 {
     if (index.isValid()) {
         this->setActiveTreeview(ui->treeLeft);
-        qDebug() << this->m_ActiveTreeview->currentIndex();
     }
 }
 
@@ -285,6 +304,5 @@ void MainWindow::on_treeRight_clicked(const QModelIndex &index)
 {
     if (index.isValid()) {
         this->setActiveTreeview(ui->treeRight);
-        qDebug() << this->m_ActiveTreeview->currentIndex();
     }
 }

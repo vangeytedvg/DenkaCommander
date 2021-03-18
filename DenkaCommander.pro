@@ -10,11 +10,13 @@ CONFIG += c++11
 
 SOURCES += \
     dvgsettings.cpp \
+    folderutils.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     dvgsettings.h \
+    folderutils.h \
     mainwindow.h
 
 FORMS += \
