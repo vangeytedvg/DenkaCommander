@@ -1,13 +1,15 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "folderutils.h"
 #include <QDebug>
 #include <QMessageBox>
+#include <QFile>
 #include <QModelIndex>
 #include <QCloseEvent>
 #include <QSettings>
 #include <QRect>
 #include <QDesktopWidget>
+#include <QDesktopServices>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -21,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->model_left = new QFileSystemModel();
     this->model_left->setRootPath(QDir::rootPath());
     ui->treeLeft->setModel(this->model_left);
-    ui->treeLeft->setRootIndex(this->model_left->index(QDir::rootPath()));
+    ui->treeLeft->setRootIndex(this->model_left->index(QDir::homePath()));
     this->model_left->sort(0, Qt::AscendingOrder);
     // Nothing selected on the left!
     ui->treeLeft->setCurrentIndex(this->model_left->index(0));
@@ -33,25 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeRight->setRootIndex(this->model_right->index(QDir::homePath()));
     this->readSettings();
     this->setActiveTreeview(NULL);
-//    this->model_left->setFilter(QDir::AllDirs);
-
-    // Connect the selection changed signal and slot.
-    // Bizarre, when I named the slot on_row_changed I got a bizarre error message.
-    // When I renamed it to on_rowChanged, no problem anymore!!!
-//    connect(ui->treeLeft->selectionModel(),
-//            SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-//            this,
-//            SLOT(on_rowChanged(const QItemSelection&, const QItemSelection&)));
 }
-
-
-//void MainWindow::on_rowChanged(const QItemSelection &a, const QItemSelection &b){
-
-//    qDebug() << "KWAKAKAK" << a.indexes();
-
-//    int c = a.indexes().count();
-//    qDebug() << c;
-//}
 
 MainWindow::~MainWindow()
 {
@@ -59,15 +43,23 @@ MainWindow::~MainWindow()
 }
 
 /**
+ * @brief Quit the application
+ */
+void MainWindow::on_actionE_xit_triggered()
+{
+    close();
+}
+
+/**
  * @brief MainWindow::setupAdditionalUI
  */
 void MainWindow::setupAdditionalUI() {
     // Add a progress bar to the statusbar...
-    statusProgress = new QProgressBar();
-    statusProgress->setMaximum(100);
-    statusProgress->setMaximumWidth(100);
-    ui->statusbar->addPermanentWidget(statusProgress);
-    statusProgress->setValue(0);
+    this->statusProgress = new QProgressBar();
+    this->statusProgress->setMaximum(100);
+    this->statusProgress->setMaximumWidth(100);
+    ui->statusbar->addPermanentWidget(this->statusProgress);
+    this->statusProgress->setValue(0);
 }
 
 /**
@@ -88,19 +80,6 @@ QTreeView *MainWindow::ActiveTreeview() const
 void MainWindow::setActiveTreeview(QTreeView *ActiveTreeview)
 {
     m_ActiveTreeview = ActiveTreeview;
-//    if (m_ActiveTreeview) {
-//        This is how to get the name of an object
-//        qDebug() << m_ActiveTreeview->objectName();
-//    }
-}
-
-
-/**
- * @brief Quit the application
- */
-void MainWindow::on_actionE_xit_triggered()
-{
-    close();
 }
 
 /**
@@ -108,7 +87,6 @@ void MainWindow::on_actionE_xit_triggered()
  * @param event
  */
 void MainWindow::closeEvent(QCloseEvent *event) {
-    qDebug() << "Shutdown app...";
     saveSettings();
     event->accept();
 }
@@ -119,8 +97,11 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 void MainWindow::saveSettings() {
     QSettings settings("DenkaTech","Denka Commander");
     settings.beginGroup("MainWindow");
-    qDebug() << "Accessing ini at : " << settings.fileName();
     settings.setValue("form/geometry", saveGeometry());
+    settings.endGroup();
+    settings.beginGroup("Navigators");
+    settings.setValue("nav/treeleft", ui->treeLeft->header()->saveState());
+    settings.setValue("nav/treeright", ui->treeRight->header()->saveState());
     settings.endGroup();
 }
 
@@ -130,7 +111,7 @@ void MainWindow::saveSettings() {
  */
 void MainWindow::readSettings() {
     QSettings settings("DenkaTech","Denka Commander");
-    qDebug() << "Reading config values in " << settings.fileName();
+
     settings.beginGroup("MainWindow");
     const QByteArray geometry = settings.value("form/geometry", QByteArray()).toByteArray();
     if (geometry.isEmpty()) {
@@ -141,6 +122,13 @@ void MainWindow::readSettings() {
     } else {
         restoreGeometry(geometry);
     }
+    settings.endGroup();
+    // Restore the configuration of the treeviews
+    settings.beginGroup("Navigators");
+    const QByteArray treeleft = settings.value("nav/treeleft", QByteArray()).toByteArray();
+    ui->treeLeft->header()->restoreState(treeleft);
+    const QByteArray treeright = settings.value("nav/treeright", QByteArray()).toByteArray();
+    ui->treeRight->header()->restoreState(treeright);
     settings.endGroup();
 }
 
@@ -170,16 +158,26 @@ void MainWindow::on_action_Collapse_all_triggered()
  */
 void MainWindow::on_actionCopy_directory_triggered()
 {
-    // First find out what is selected on the left side
-    FolderUtils fu;
-
     QModelIndex leftIndex = ui->treeLeft->currentIndex();
-
     QString leftPath = this->model_left->fileInfo(leftIndex).absoluteFilePath();
-    fu.setSourcePath(leftPath);
-    long nrOfFiles = fu.countFiles();
-    qDebug() << nrOfFiles << Qt::endl;
-    return;
+    this->m_totalNrOfFiles = 0;
+    this->countFilesInFolder(leftPath);
+    this->progress = new QProgressDialog(this);
+    this->progress->setMaximum(this->m_totalNrOfFiles);
+    this->progress->setWindowTitle("Copying files");
+    this->progress->show();
+    QCoreApplication::processEvents(QEventLoop::AllEvents);
+    QString info = QString::number(this->m_totalNrOfFiles);
+    ui->statusbar->showMessage("Nr of files to copy: " + info);
+    QCoreApplication::processEvents();
+    if (this->m_totalNrOfFiles > 1000) {
+        QMessageBox::StandardButton answer;
+        answer = QMessageBox::information(this, "Copy", "There are a large nr of files to copy, this can take a long time. Continue?", QMessageBox::Yes|QMessageBox::No);
+        if (answer == QMessageBox::No) {
+            this->m_totalNrOfFiles = 0;
+            return;
+        }
+    }
     // Something selected on the left side?
     if (leftIndex.isValid()) {
         // Check the right side now...
@@ -187,9 +185,7 @@ void MainWindow::on_actionCopy_directory_triggered()
         // Have we a selection there?
         if (rightIndex.isValid()) {
             QString rightPath = this->model_left->fileInfo(rightIndex).absoluteFilePath();
-            QFileInfo pathInfo(leftPath);
-            qDebug() << "WAZAAA" << pathInfo.baseName();
-
+            QFileInfo pathInfo(leftPath);            
             // We are not on the same path huh?
             if (rightPath == leftPath) {
                 QMessageBox::warning(this, "Warning", "Source and target folders are the same!");
@@ -201,6 +197,8 @@ void MainWindow::on_actionCopy_directory_triggered()
                 return;
             } else {
                 // Are we copying a file or a directory?
+                QCoreApplication::processEvents();
+                ui->statusbar->showMessage("Copy started...");
                 if (this->model_left->isDir(leftIndex)) {
                     // Before starting the copy, we must make a directory in the target section,
                     // caution we need to take the name of the root that we copy and give it to
@@ -211,11 +209,12 @@ void MainWindow::on_actionCopy_directory_triggered()
                         QMessageBox::StandardButton answer;
                         answer = QMessageBox::warning(this, "Attention", "Folder exists in target, overwrite?", QMessageBox::Yes|QMessageBox::No);
                         if (answer == QMessageBox::No) {
+                            ui->statusbar->showMessage("Copy cancelled...", 5000);
                             return;
                         }
                     }
                     this->copyFolder(leftPath, targetDir);
-                    ui->statusbar->showMessage("Files copied to target directory!", 5000);
+                    ui->statusbar->showMessage(info + " file(s) copied to target directory!", 5000);
                 } else {
                     // Must be a file if we get here, get the base filename
                     QFileInfo fi(leftPath);
@@ -226,6 +225,7 @@ void MainWindow::on_actionCopy_directory_triggered()
                         QMessageBox::StandardButton answer;
                         answer = QMessageBox::warning(this, "Attention", "File exists in target, overwrite?", QMessageBox::Yes|QMessageBox::No);
                         if (answer == QMessageBox::No) {
+                            ui->statusbar->showMessage("Copy cancelled...", 5000);
                             return;
                         }
                     }
@@ -240,7 +240,42 @@ void MainWindow::on_actionCopy_directory_triggered()
         // No selection on the left
         QMessageBox::information(this,"Info", "No selection on source!");
     }
+    this->statusProgress->setValue(0);
+    ui->statusbar->showMessage("Done", 5000);
+    this->progress->hide();
 }
+
+/**
+ * @brief MainWindow::countFilesInFolder
+ * Counts the files in the selected path
+ * @param path
+ */
+void MainWindow::countFilesInFolder(const QString &path)
+{
+    // Get the directory on the left side
+    QDir sourceDir(path);
+    // Get the files and copy them
+    QStringList files = sourceDir.entryList(QDir::Files);
+    this->m_totalNrOfFiles += files.count();
+
+    files.clear();
+    // In case of a subdirectory, use recursion
+    files = sourceDir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Files);
+    for(int i = 0; i< files.count(); i++)
+    {
+        QString srcName = path + "/" + files[i];
+        countFilesInFolder(srcName);
+    }
+
+    // Add the files too
+    if (this->m_totalNrOfFiles % 5 == 0) {
+        // Convert long to string in QT
+        QString info = QString::number(this->m_totalNrOfFiles);
+        ui->statusbar->showMessage("Nr of files :" + info);
+        QCoreApplication::processEvents();
+    }
+}
+
 
 /**
  * @brief Recursively copy folder from left to right panel
@@ -252,6 +287,13 @@ void MainWindow::copyFolder(QString sourceFolder, QString destFolder)
     // Get the directory on the left side
     QDir sourceDir(sourceFolder);
 
+    this->m_totalCopied += 1;
+//    if (this->m_totalCopied % 5 == 0) {
+    QCoreApplication::processEvents();
+    this->progress->setValue(this->m_totalCopied);
+
+//    }
+
     if(!sourceDir.exists())
         return;
     // Directory on the right side (target)
@@ -262,29 +304,25 @@ void MainWindow::copyFolder(QString sourceFolder, QString destFolder)
     }
     // Get the files and copy them
     QStringList files = sourceDir.entryList(QDir::Files);
-    qDebug() << "Nr of files " << files.count();
-    double maxFiles = (double)files.count();
+
+    this->m_filesCopied += files.count();
     for(int i = 0; i < files.count(); i++)
     {      
         QString srcName = sourceFolder + "/" + files[i];
         QString destName = destFolder + "/" + files[i];
-        QFile::copy(srcName, destName);
-        ui->statusbar->showMessage("Copying" + srcName + " to " + destName);
-        double res = ((double)i / maxFiles) * 100;
-        statusProgress->setValue(res);
-        QCoreApplication::processEvents();
-
+        QFile::copy(srcName, destName);      
+        this->progress->setLabelText(tr("Copying %1").arg(files[i]));
     }
     files.clear();
     // In case of a subdirectory, use recursion
     files = sourceDir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+    this->m_filesCopied += files.count();
     for(int i = 0; i< files.count(); i++)
     {
         QString srcName = sourceFolder + "/" + files[i];
         QString destName = destFolder + "/" + files[i];
         copyFolder(srcName, destName);
     }
-    statusProgress->setValue(0);
 }
 
 /**
@@ -311,4 +349,33 @@ void MainWindow::on_treeRight_clicked(const QModelIndex &index)
     if (index.isValid()) {
         this->setActiveTreeview(ui->treeRight);
     }
+}
+
+/**
+ * @brief MainWindow::on_action_Open_triggered
+ * Open a file for viewing
+ */
+void MainWindow::on_action_Open_triggered()
+{
+    // Get the name of the selected file, if its a folder refuse that
+    if (this->ActiveTreeview() != nullptr) {
+        QModelIndex leftIndex = this->m_ActiveTreeview->currentIndex();
+        if (leftIndex.isValid()) {
+            QString leftPath = this->model_left->fileInfo(leftIndex).absoluteFilePath();
+            QFileInfo f(leftPath);
+            if (f.isDir()) {
+                return;
+            }
+            // Like the f"" string in Python:
+            QString sbarInfo = QString("Trying to open %1").arg(f.absoluteFilePath());
+            ui->statusbar->showMessage(sbarInfo);
+            bool couldOpen = QDesktopServices::openUrl(QUrl::fromLocalFile(f.absoluteFilePath()));
+            if (!couldOpen) {
+                QMessageBox::critical(this, "Info", "No ascociated application");
+            } else {
+                ui->statusbar->showMessage("File opening", 2000);
+            }
+        }
+    }
+
 }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1094</width>
+    <height>594</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,6 +21,15 @@
        <enum>Qt::Horizontal</enum>
       </property>
       <widget class="QTreeView" name="treeLeft">
+       <property name="dragEnabled">
+        <bool>false</bool>
+       </property>
+       <property name="dragDropMode">
+        <enum>QAbstractItemView::DragOnly</enum>
+       </property>
+       <property name="alternatingRowColors">
+        <bool>false</bool>
+       </property>
        <property name="selectionMode">
         <enum>QAbstractItemView::SingleSelection</enum>
        </property>
@@ -36,11 +45,26 @@
        <property name="animated">
         <bool>true</bool>
        </property>
-       <property name="wordWrap">
+       <property name="allColumnsShowFocus">
         <bool>true</bool>
+       </property>
+       <property name="wordWrap">
+        <bool>false</bool>
        </property>
       </widget>
       <widget class="QTreeView" name="treeRight">
+       <property name="acceptDrops">
+        <bool>false</bool>
+       </property>
+       <property name="dragEnabled">
+        <bool>false</bool>
+       </property>
+       <property name="dragDropMode">
+        <enum>QAbstractItemView::DropOnly</enum>
+       </property>
+       <property name="defaultDropAction">
+        <enum>Qt::MoveAction</enum>
+       </property>
        <property name="iconSize">
         <size>
          <width>32</width>
@@ -54,7 +78,7 @@
         <bool>true</bool>
        </property>
        <property name="wordWrap">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
      </widget>
@@ -66,7 +90,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>1094</width>
      <height>22</height>
     </rect>
    </property>
@@ -74,6 +98,7 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="action_Open"/>
     <addaction name="actionE_xit"/>
    </widget>
    <widget class="QMenu" name="menu_Tree">
@@ -118,6 +143,8 @@
    <addaction name="actionMkdir"/>
    <addaction name="separator"/>
    <addaction name="actionDelete"/>
+   <addaction name="separator"/>
+   <addaction name="action_Open"/>
   </widget>
   <action name="actionE_xit">
    <property name="icon">
@@ -204,6 +231,15 @@
    </property>
    <property name="shortcut">
     <string>F9</string>
+   </property>
+  </action>
+  <action name="action_Open">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/imgs/binoculars2.png</normaloff>:/imgs/binoculars2.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Open</string>
    </property>
   </action>
  </widget>

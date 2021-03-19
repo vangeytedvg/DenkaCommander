@@ -6,6 +6,7 @@
 #include <QFileSystemModel>
 #include <QProgressBar>
 #include <QTreeView>
+#include <QProgressDialog>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -23,6 +24,7 @@ public:
     QTreeView *ActiveTreeview() const;
     void setActiveTreeview(QTreeView *ActiveTreeview);
 
+
 private slots:
     void on_actionE_xit_triggered();
     void on_action_Expand_all_triggered();
@@ -32,18 +34,25 @@ private slots:
     void on_treeRight_clicked(const QModelIndex &index);
     //void on_rowChanged(const QItemSelection &a, const QItemSelection &b);
 
+    void on_action_Open_triggered();
+
 private:
     Ui::MainWindow *ui;
     QString currentPath = "";
     QFileSystemModel *model_left;
     QFileSystemModel *model_right;
+    QProgressDialog *progress;
     void copyFolder(QString sourceFolder, QString destFolder);
     void readSettings();
     void saveSettings();
     void setupAdditionalUI();
+    void countFilesInFolder(const QString &path);
     QProgressBar *statusProgress;
     QTreeView *m_ActiveTreeview;
     QString m_Tree;
+    long m_totalNrOfFiles = 0;
+    long m_filesCopied = 0;
+    long m_totalCopied = 0;
 
 protected:
     void closeEvent(QCloseEvent *event) override;
