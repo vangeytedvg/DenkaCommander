@@ -433,26 +433,37 @@ void MainWindow::on_actionRename_triggered()
             w.setNewName(activeModel->fileInfo(selectedIndex).filePath());
             int result = w.exec();
             if (result == DIALOGRESULTOK) {
-                if (w.NewName() == w.Oldname()) {
-                    qDebug("Hey makker");
+                // Try to rename the file
+                QFile f(w.NewName());
+                if (f.exists()) {
+                    QMessageBox::warning(this, "Rename", "Such a file/folder already exists!");
                     return;
-                } else {
-                    // Try to rename the file
-                    try {
-                        renameDir(thePath, w.NewName());
-                    }  catch (...) {
-                      qDebug() << "Error occured";
-                    }
                 }
-                qDebug() << result << w.NewName();
+                try {
+                    renameDir(thePath, w.NewName());
+                }  catch (...) {
+                    QMessageBox::warning(this, "Rename", "An error occured!");
+                }
             }
         }
+    } else {
+        QMessageBox::information(this, "Rename", "Please select a file or folder to rename!");
     }
 }
 
+/**
+ * @brief MainWindow::renameDir
+ * @abstract Rename a directory or file
+ * @param oldName
+ * @param newName
+ * @return
+ */
 bool MainWindow::renameDir(const QString &oldName, const QString &newName) {
   auto src = QDir::cleanPath(oldName);
   auto dst = QDir::cleanPath(newName);
-  auto rc = QFile::rename(src, dst);
+  bool rc = QFile::rename(src, dst);
+  if (!rc) {
+      QMessageBox::information(this, "Rename", "Could not rename the file!");
+  }
   return rc;
 }

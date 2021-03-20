@@ -111,7 +111,7 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
-        <widget class="QLabel" name="label_3">
+        <widget class="QLabel" name="label_F2">
          <property name="styleSheet">
           <string notr="true">color: rgb(0, 0, 0);
 background-color: rgb(0, 255, 255);
@@ -133,7 +133,7 @@ padding: 4px;</string>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_4">
+        <widget class="QLabel" name="label_F3">
          <property name="styleSheet">
           <string notr="true">color: rgb(0, 0, 0);
 background-color: rgb(0, 255, 255);
@@ -156,7 +156,7 @@ padding: 4px;
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="label_F5">
          <property name="styleSheet">
           <string notr="true">color: rgb(0, 0, 0);
 background-color: rgb(0, 255, 255);
@@ -178,7 +178,7 @@ padding: 4px;</string>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="label_F6">
          <property name="styleSheet">
           <string notr="true">color: rgb(0, 0, 0);
 background-color: rgb(0, 255, 255);
@@ -200,7 +200,7 @@ padding: 4px;</string>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_5">
+        <widget class="QLabel" name="label_CTRLDEL">
          <property name="styleSheet">
           <string notr="true">color: rgb(0, 0, 0);
 background-color: rgb(0, 255, 255);
@@ -222,7 +222,7 @@ padding: 4px;</string>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_7">
+        <widget class="QLabel" name="label_F7">
          <property name="styleSheet">
           <string notr="true">color: rgb(0, 0, 0);
 background-color: rgb(0, 255, 255);
@@ -244,7 +244,7 @@ padding: 4px;</string>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_6">
+        <widget class="QLabel" name="label_F9">
          <property name="styleSheet">
           <string notr="true">color: rgb(0, 0, 0);
 background-color: rgb(0, 255, 255);
@@ -255,6 +255,28 @@ padding: 4px;</string>
          </property>
          <property name="text">
           <string>F9: MKDIR</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="styleSheet">
+          <string notr="true">color: rgb(0, 0, 0);
+background-color: rgb(0, 255, 255);
+font: bold;
+border: 0px solid #242322;
+spacing: 0px;
+padding: 4px;</string>
+         </property>
+         <property name="text">
+          <string>F10: EXIT</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="Line" name="line_7">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
         </widget>
        </item>
@@ -332,6 +354,9 @@ padding: 4px;</string>
    </property>
    <property name="text">
     <string>E&amp;xit</string>
+   </property>
+   <property name="shortcut">
+    <string>F10</string>
    </property>
   </action>
   <action name="action_Expand_all">
