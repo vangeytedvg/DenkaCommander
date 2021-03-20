@@ -9,16 +9,17 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    dvgsettings.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    renamewindow.cpp
 
 HEADERS += \
-    dvgsettings.h \
-    mainwindow.h
+    mainwindow.h \
+    renamewindow.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    renamewindow.ui
 
 TRANSLATIONS += \
     DenkaCommander_en_US.ts
@@ -246,5 +247,4 @@ DISTFILES += \
     qdarkstyle/style.qss \
     uml_layout.qmodel
 
-STATECHARTS += \
-    test.scxml
+STATECHARTS +=

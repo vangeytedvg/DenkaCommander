@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "renamewindow.h"
 #include <QDebug>
 #include <QMessageBox>
 #include <QFile>
@@ -10,7 +11,6 @@
 #include <QDesktopWidget>
 #include <QDesktopServices>
 
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -18,7 +18,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     this->currentPath.clear();
     this->setWindowTitle("Denka Commander");
-    this->setupAdditionalUI();
     // Left side browser
     this->model_left = new QFileSystemModel();
     this->model_left->setRootPath(QDir::rootPath());
@@ -92,6 +91,25 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 }
 
 /**
+ * @brief MainWindow::getActiveModel
+ * @return
+ */
+QFileSystemModel *MainWindow::getActiveModel() const
+{
+    return activeModel;
+}
+
+/**
+ * @brief MainWindow::setActiveModel
+ * @param value
+ */
+void MainWindow::setActiveModel(QFileSystemModel *value)
+{
+    activeModel = value;
+}
+
+
+/**
  * @brief Write the settings of the form to the .conf file
  */
 void MainWindow::saveSettings() {
@@ -139,8 +157,12 @@ void MainWindow::readSettings() {
 void MainWindow::on_action_Expand_all_triggered()
 {
     // Find out who is the active treeview
-    QModelIndex qi = this->ActiveTreeview()->currentIndex();
-    this->ActiveTreeview()->expandRecursively(qi, -1);
+    if (ActiveTreeview() != nullptr) {
+        QModelIndex qi = this->ActiveTreeview()->currentIndex();
+        this->ActiveTreeview()->expandRecursively(qi, -1);
+    } else {
+        QMessageBox::warning(this, "Warning", "Select a folder to expand!");
+    }
 }
 
 /**
@@ -149,8 +171,12 @@ void MainWindow::on_action_Expand_all_triggered()
  */
 void MainWindow::on_action_Collapse_all_triggered()
 {
-    QModelIndex qi = this->ActiveTreeview()->currentIndex();
-    this->ActiveTreeview()->collapse(qi);
+    if (ActiveTreeview() != nullptr) {
+        QModelIndex qi = this->ActiveTreeview()->currentIndex();
+        this->ActiveTreeview()->collapse(qi);
+    } else {
+        QMessageBox::warning(this, "Warning", "Select a folder to collapse!");
+    }
 }
 
 /**
@@ -162,17 +188,16 @@ void MainWindow::on_actionCopy_directory_triggered()
     QString leftPath = this->model_left->fileInfo(leftIndex).absoluteFilePath();
     this->m_totalNrOfFiles = 0;
     this->countFilesInFolder(leftPath);
-    this->progress = new QProgressDialog(this);
-    this->progress->setMaximum(this->m_totalNrOfFiles);
-    this->progress->setWindowTitle("Copying files");
-    this->progress->show();
-    QCoreApplication::processEvents(QEventLoop::AllEvents);
+
     QString info = QString::number(this->m_totalNrOfFiles);
     ui->statusbar->showMessage("Nr of files to copy: " + info);
     QCoreApplication::processEvents();
     if (this->m_totalNrOfFiles > 1000) {
         QMessageBox::StandardButton answer;
-        answer = QMessageBox::information(this, "Copy", "There are a large nr of files to copy, this can take a long time. Continue?", QMessageBox::Yes|QMessageBox::No);
+        answer = QMessageBox::information(this,
+                    "Copy",
+                    "There are a large nr of files to copy, this can take a long time. Continue?",
+                    QMessageBox::Yes|QMessageBox::No);
         if (answer == QMessageBox::No) {
             this->m_totalNrOfFiles = 0;
             return;
@@ -213,8 +238,15 @@ void MainWindow::on_actionCopy_directory_triggered()
                             return;
                         }
                     }
+
+                    this->progress = new QProgressDialog(this);
+                    this->progress->setMaximum(this->m_totalNrOfFiles);
+                    this->progress->setWindowTitle("Copying files");
+                    this->progress->show();
                     this->copyFolder(leftPath, targetDir);
                     ui->statusbar->showMessage(info + " file(s) copied to target directory!", 5000);
+                    this->progress->hide();
+                    delete this->progress;
                 } else {
                     // Must be a file if we get here, get the base filename
                     QFileInfo fi(leftPath);
@@ -240,9 +272,7 @@ void MainWindow::on_actionCopy_directory_triggered()
         // No selection on the left
         QMessageBox::information(this,"Info", "No selection on source!");
     }
-    this->statusProgress->setValue(0);
     ui->statusbar->showMessage("Done", 5000);
-    this->progress->hide();
 }
 
 /**
@@ -267,7 +297,6 @@ void MainWindow::countFilesInFolder(const QString &path)
         countFilesInFolder(srcName);
     }
 
-    // Add the files too
     if (this->m_totalNrOfFiles % 5 == 0) {
         // Convert long to string in QT
         QString info = QString::number(this->m_totalNrOfFiles);
@@ -288,20 +317,19 @@ void MainWindow::copyFolder(QString sourceFolder, QString destFolder)
     QDir sourceDir(sourceFolder);
 
     this->m_totalCopied += 1;
-//    if (this->m_totalCopied % 5 == 0) {
     QCoreApplication::processEvents();
     this->progress->setValue(this->m_totalCopied);
-
-//    }
 
     if(!sourceDir.exists())
         return;
     // Directory on the right side (target)
     QDir destDir(destFolder);
+
     if(!destDir.exists())
     {
         destDir.mkdir(destFolder);
     }
+
     // Get the files and copy them
     QStringList files = sourceDir.entryList(QDir::Files);
 
@@ -334,7 +362,8 @@ void MainWindow::copyFolder(QString sourceFolder, QString destFolder)
 void MainWindow::on_treeLeft_clicked(const QModelIndex &index)
 {
     if (index.isValid()) {
-        this->setActiveTreeview(ui->treeLeft);
+        setActiveTreeview(ui->treeLeft);
+        setActiveModel(model_left);
     }
 }
 
@@ -347,7 +376,7 @@ void MainWindow::on_treeLeft_clicked(const QModelIndex &index)
 void MainWindow::on_treeRight_clicked(const QModelIndex &index)
 {
     if (index.isValid()) {
-        this->setActiveTreeview(ui->treeRight);
+        setActiveTreeview(ui->treeRight);
     }
 }
 
@@ -359,9 +388,9 @@ void MainWindow::on_action_Open_triggered()
 {
     // Get the name of the selected file, if its a folder refuse that
     if (this->ActiveTreeview() != nullptr) {
-        QModelIndex leftIndex = this->m_ActiveTreeview->currentIndex();
-        if (leftIndex.isValid()) {
-            QString leftPath = this->model_left->fileInfo(leftIndex).absoluteFilePath();
+        QModelIndex selectedIndex = this->m_ActiveTreeview->currentIndex();
+        if (selectedIndex.isValid()) {
+            QString leftPath = this->model_left->fileInfo(selectedIndex).absoluteFilePath();
             QFileInfo f(leftPath);
             if (f.isDir()) {
                 return;
@@ -378,4 +407,52 @@ void MainWindow::on_action_Open_triggered()
         }
     }
 
+}
+
+/**
+ * @brief MainWindow::on_actionRename_triggered
+ * Rename the selection
+ */
+void MainWindow::on_actionRename_triggered()
+{
+    if (this->ActiveTreeview() != nullptr) {
+        qDebug() << "Rename called";
+        QModelIndex selectedIndex = m_ActiveTreeview->currentIndex();
+        if (selectedIndex.isValid()) {
+            QString thePath = activeModel->fileInfo(selectedIndex).absoluteFilePath();
+            // Obtain info about the selection
+            QFileInfo f(thePath);
+            RenameWindow w;
+            if (f.isDir()) {
+                // We are renaming a directory here
+                w.setMainTitle("Rename folder : " + activeModel->fileInfo(selectedIndex).baseName());
+            } else if (f.isFile()) {
+                w.setMainTitle("Rename file : " + activeModel->fileInfo(selectedIndex).baseName());
+            }
+            w.setOldname(thePath);
+            w.setNewName(activeModel->fileInfo(selectedIndex).filePath());
+            int result = w.exec();
+            if (result == DIALOGRESULTOK) {
+                if (w.NewName() == w.Oldname()) {
+                    qDebug("Hey makker");
+                    return;
+                } else {
+                    // Try to rename the file
+                    try {
+                        renameDir(thePath, w.NewName());
+                    }  catch (...) {
+                      qDebug() << "Error occured";
+                    }
+                }
+                qDebug() << result << w.NewName();
+            }
+        }
+    }
+}
+
+bool MainWindow::renameDir(const QString &oldName, const QString &newName) {
+  auto src = QDir::cleanPath(oldName);
+  auto dst = QDir::cleanPath(newName);
+  auto rc = QFile::rename(src, dst);
+  return rc;
 }
