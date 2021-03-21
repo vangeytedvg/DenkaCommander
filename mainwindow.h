@@ -6,6 +6,7 @@
 #include <QProgressBar>
 #include <QTreeView>
 #include <QProgressDialog>
+#include "codeeditor.h"
 
 #define DIALOGRESULTOK 1
 #define DIALOGRESULTCANCEL 0
@@ -37,7 +38,7 @@ private slots:
     void on_actionCopy_directory_triggered();
     void on_treeLeft_clicked(const QModelIndex &index);
     void on_treeRight_clicked(const QModelIndex &index);
-    //void on_rowChanged(const QItemSelection &a, const QItemSelection &b);
+    void on_TreeSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
 
     void on_action_Open_triggered();
 
@@ -50,6 +51,7 @@ private:
     QFileSystemModel *model_right;
     QFileSystemModel *activeModel;
     QProgressDialog *progress;
+//    CodeEditor *ed;
     void copyFolder(QString sourceFolder, QString destFolder);
     void readSettings();
     void saveSettings();

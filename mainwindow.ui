@@ -340,7 +340,6 @@ padding: 4px;</string>
    <addaction name="actionCopy_directory"/>
    <addaction name="actionRename"/>
    <addaction name="actionMkdir"/>
-   <addaction name="separator"/>
    <addaction name="actionDelete"/>
    <addaction name="separator"/>
    <addaction name="action_Open"/>

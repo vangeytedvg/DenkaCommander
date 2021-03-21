@@ -1,13 +1,13 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "renamewindow.h"
+#include "codeeditor.h"
 #include <QDebug>
 #include <QMessageBox>
 #include <QFile>
 #include <QModelIndex>
 #include <QCloseEvent>
 #include <QSettings>
-#include <QRect>
 #include <QDesktopWidget>
 #include <QDesktopServices>
 
@@ -33,20 +33,30 @@ MainWindow::MainWindow(QWidget *parent)
     this->model_right->sort(0, Qt::AscendingOrder);
     ui->treeRight->setRootIndex(this->model_right->index(QDir::homePath()));
     this->readSettings();
-    this->setActiveTreeview(NULL);
+    this->setActiveModel(NULL);
+    this->setActiveTreeview(ui->treeLeft);
+
+    // Pfew this took some time to make this work
+    connect(this->ui->treeLeft->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
+    connect(this->ui->treeRight->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+//    delete ed;
 }
 
 /**
  * @brief Quit the application
  */
 void MainWindow::on_actionE_xit_triggered()
-{
+{  
     close();
+}
+
+void MainWindow::on_TreeSelectionChanged(const QModelIndex &current, const QModelIndex &previous) {
+    qDebug() << "Kwak" << " " << current;
 }
 
 /**
@@ -86,6 +96,9 @@ void MainWindow::setActiveTreeview(QTreeView *ActiveTreeview)
  * @param event
  */
 void MainWindow::closeEvent(QCloseEvent *event) {
+//    if (ed) {
+//        ed->close();
+//    }
     saveSettings();
     event->accept();
 }
@@ -393,12 +406,18 @@ void MainWindow::on_action_Open_triggered()
             QString leftPath = this->model_left->fileInfo(selectedIndex).absoluteFilePath();
             QFileInfo f(leftPath);
             if (f.isDir()) {
+                QMessageBox::information(this,"Open", "Only files can be edited!");
                 return;
             }
             // Like the f"" string in Python:
             QString sbarInfo = QString("Trying to open %1").arg(f.absoluteFilePath());
             ui->statusbar->showMessage(sbarInfo);
             bool couldOpen = QDesktopServices::openUrl(QUrl::fromLocalFile(f.absoluteFilePath()));
+//            ed = new CodeEditor();
+//            ed->setWindowTitle(QObject::tr("Code Editor Example"));
+//            ed->setFileToOpen(f.baseName());
+//            ed->show();
+
             if (!couldOpen) {
                 QMessageBox::critical(this, "Info", "No ascociated application");
             } else {
@@ -459,11 +478,13 @@ void MainWindow::on_actionRename_triggered()
  * @return
  */
 bool MainWindow::renameDir(const QString &oldName, const QString &newName) {
-  auto src = QDir::cleanPath(oldName);
-  auto dst = QDir::cleanPath(newName);
-  bool rc = QFile::rename(src, dst);
-  if (!rc) {
-      QMessageBox::information(this, "Rename", "Could not rename the file!");
-  }
-  return rc;
+    // Cleanpath normalizes a path eg \ becomes /
+    QString src = QDir::cleanPath(oldName);
+    QString dst = QDir::cleanPath(newName);
+    // Rename
+    bool rc = QFile::rename(src, dst);
+    if (!rc) {
+        QMessageBox::information(this, "Rename", "Could not rename the file!");
+    }
+    return rc;
 }
