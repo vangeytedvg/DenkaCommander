@@ -55,8 +55,15 @@ void MainWindow::on_actionE_xit_triggered()
     close();
 }
 
+/**
+ * @brief MainWindow::on_TreeSelectionChanged
+ * Keep track of what element is selected in the treeviews
+ * @param current
+ * @param previous
+ */
 void MainWindow::on_TreeSelectionChanged(const QModelIndex &current, const QModelIndex &previous) {
-    qDebug() << "Kwak" << " " << current;
+    setSelectedTreeRow(current.row());
+    //qDebug() << "Kwak" << " " << current << " " << previous << getSelectedTreeRow();
 }
 
 /**
@@ -89,6 +96,24 @@ QTreeView *MainWindow::ActiveTreeview() const
 void MainWindow::setActiveTreeview(QTreeView *ActiveTreeview)
 {
     m_ActiveTreeview = ActiveTreeview;
+}
+
+/**
+ * @brief MainWindow::getSelectedTreeRow
+ * @return
+ */
+int MainWindow::getSelectedTreeRow() const
+{
+    return selectedTreeRow;
+}
+
+/**
+ * @brief MainWindow::setSelectedTreeRow
+ * @param value
+ */
+void MainWindow::setSelectedTreeRow(int value)
+{
+    selectedTreeRow = value;
 }
 
 /**

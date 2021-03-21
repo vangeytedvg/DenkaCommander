@@ -31,6 +31,9 @@ public:
     QFileSystemModel *getActiveModel() const;
     void setActiveModel(QFileSystemModel *value);
 
+    int getSelectedTreeRow() const;
+    void setSelectedTreeRow(int value);
+
 private slots:
     void on_actionE_xit_triggered();
     void on_action_Expand_all_triggered();
@@ -51,6 +54,7 @@ private:
     QFileSystemModel *model_right;
     QFileSystemModel *activeModel;
     QProgressDialog *progress;
+    int selectedTreeRow = 0;
 //    CodeEditor *ed;
     void copyFolder(QString sourceFolder, QString destFolder);
     void readSettings();
