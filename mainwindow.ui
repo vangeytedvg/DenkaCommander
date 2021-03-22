@@ -128,12 +128,13 @@
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">color:rgb(255, 255, 255);
-background-color: rgb(0, 85, 127);
+          <string notr="true">color:rgb(0,0,0);
+background-color: #c9c734;
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
-padding: 4px;</string>
+padding: 4px;
+border-radius:  5px;</string>
          </property>
          <property name="text">
           <string>F2</string>
@@ -143,12 +144,13 @@ padding: 4px;</string>
        <item>
         <widget class="QLabel" name="label_F2">
          <property name="styleSheet">
-          <string notr="true">color: rgb(0, 0, 0);
-background-color: rgb(0, 255, 255);
+          <string notr="true">color:rgb(255, 255, 255);
+background-color: rgb(0, 96, 120);
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
-padding: 4px;</string>
+padding: 4px;
+border-radius:  5px;</string>
          </property>
          <property name="text">
           <string>EXPAND TREE</string>
@@ -183,12 +185,13 @@ padding: 4px;</string>
        <item>
         <widget class="QLabel" name="label_F2_3">
          <property name="styleSheet">
-          <string notr="true">color:rgb(255, 255, 255);
-background-color: rgb(0, 85, 127);
+          <string notr="true">color:rgb(0,0,0);
+background-color: #c9c734;
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
-padding: 4px;</string>
+padding: 4px;
+border-radius:  5px;</string>
          </property>
          <property name="text">
           <string>F3</string>
@@ -198,13 +201,13 @@ padding: 4px;</string>
        <item>
         <widget class="QLabel" name="label_F3">
          <property name="styleSheet">
-          <string notr="true">color: rgb(0, 0, 0);
-background-color: rgb(0, 255, 255);
+          <string notr="true">color:rgb(255, 255, 255);
+background-color: rgb(0, 96, 120);
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
 padding: 4px;
-</string>
+border-radius:  5px;</string>
          </property>
          <property name="text">
           <string>COLLAPSE TREE</string>
@@ -221,12 +224,13 @@ padding: 4px;
        <item>
         <widget class="QLabel" name="label_F2_4">
          <property name="styleSheet">
-          <string notr="true">color:rgb(255, 255, 255);
-background-color: rgb(0, 85, 127);
+          <string notr="true">color:rgb(0,0,0);
+background-color: #c9c734;
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
-padding: 4px;</string>
+padding: 4px;
+border-radius:  5px;</string>
          </property>
          <property name="text">
           <string>F5</string>
@@ -236,12 +240,13 @@ padding: 4px;</string>
        <item>
         <widget class="QLabel" name="label_F5">
          <property name="styleSheet">
-          <string notr="true">color: rgb(0, 0, 0);
-background-color: rgb(0, 255, 255);
+          <string notr="true">color:rgb(255, 255, 255);
+background-color: rgb(0, 96, 120);
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
-padding: 4px;</string>
+padding: 4px;
+border-radius:  5px;</string>
          </property>
          <property name="text">
           <string>COPY</string>
@@ -258,12 +263,13 @@ padding: 4px;</string>
        <item>
         <widget class="QLabel" name="label_F2_5">
          <property name="styleSheet">
-          <string notr="true">color:rgb(255, 255, 255);
-background-color: rgb(0, 85, 127);
+          <string notr="true">color:rgb(0,0,0);
+background-color: #c9c734;
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
-padding: 4px;</string>
+padding: 4px;
+border-radius:  5px;</string>
          </property>
          <property name="text">
           <string>F6</string>
@@ -273,15 +279,16 @@ padding: 4px;</string>
        <item>
         <widget class="QLabel" name="label_F6">
          <property name="styleSheet">
-          <string notr="true">color: rgb(0, 0, 0);
-background-color: rgb(0, 255, 255);
+          <string notr="true">color:rgb(255, 255, 255);
+background-color: rgb(0, 96, 120);
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
-padding: 4px;</string>
+padding: 4px;
+border-radius:  5px;</string>
          </property>
          <property name="text">
-          <string>F6: RENAME</string>
+          <string>RENAME</string>
          </property>
         </widget>
        </item>
@@ -295,12 +302,13 @@ padding: 4px;</string>
        <item>
         <widget class="QLabel" name="label_F2_6">
          <property name="styleSheet">
-          <string notr="true">color:rgb(255, 255, 255);
-background-color: rgb(0, 85, 127);
+          <string notr="true">color:rgb(0,0,0);
+background-color: #c9c734;
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
-padding: 4px;</string>
+padding: 4px;
+border-radius:  5px;</string>
          </property>
          <property name="text">
           <string>CTRL-DEL</string>
@@ -310,12 +318,13 @@ padding: 4px;</string>
        <item>
         <widget class="QLabel" name="label_CTRLDEL">
          <property name="styleSheet">
-          <string notr="true">color: rgb(0, 0, 0);
-background-color: rgb(0, 255, 255);
+          <string notr="true">color:rgb(255, 255, 255);
+background-color: rgb(0, 96, 120);
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
-padding: 4px;</string>
+padding: 4px;
+border-radius:  5px;</string>
          </property>
          <property name="text">
           <string>DELETE</string>
@@ -332,12 +341,13 @@ padding: 4px;</string>
        <item>
         <widget class="QLabel" name="label_F2_7">
          <property name="styleSheet">
-          <string notr="true">color:rgb(255, 255, 255);
-background-color: rgb(0, 85, 127);
+          <string notr="true">color:rgb(0,0,0);
+background-color: #c9c734;
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
-padding: 4px;</string>
+padding: 4px;
+border-radius:  5px;</string>
          </property>
          <property name="text">
           <string>F7</string>
@@ -347,12 +357,13 @@ padding: 4px;</string>
        <item>
         <widget class="QLabel" name="label_F7">
          <property name="styleSheet">
-          <string notr="true">color: rgb(0, 0, 0);
-background-color: rgb(0, 255, 255);
+          <string notr="true">color:rgb(255, 255, 255);
+background-color: rgb(0, 96, 120);
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
-padding: 4px;</string>
+padding: 4px;
+border-radius:  5px;</string>
          </property>
          <property name="text">
           <string>OPEN</string>
@@ -369,12 +380,13 @@ padding: 4px;</string>
        <item>
         <widget class="QLabel" name="label_F2_8">
          <property name="styleSheet">
-          <string notr="true">color:rgb(255, 255, 255);
-background-color: rgb(0, 85, 127);
+          <string notr="true">color:rgb(0,0,0);
+background-color: #c9c734;
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
-padding: 4px;</string>
+padding: 4px;
+border-radius:  5px;</string>
          </property>
          <property name="text">
           <string>F9</string>
@@ -384,12 +396,13 @@ padding: 4px;</string>
        <item>
         <widget class="QLabel" name="label_F9">
          <property name="styleSheet">
-          <string notr="true">color: rgb(0, 0, 0);
-background-color: rgb(0, 255, 255);
+          <string notr="true">color:rgb(255, 255, 255);
+background-color: rgb(0, 96, 120);
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
-padding: 4px;</string>
+padding: 4px;
+border-radius:  5px;</string>
          </property>
          <property name="text">
           <string>MKDIR</string>
@@ -406,12 +419,13 @@ padding: 4px;</string>
        <item>
         <widget class="QLabel" name="label_F2_9">
          <property name="styleSheet">
-          <string notr="true">color:rgb(255, 255, 255);
-background-color: rgb(0, 85, 127);
+          <string notr="true">color:rgb(0,0,0);
+background-color: #c9c734;
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
-padding: 4px;</string>
+padding: 4px;
+border-radius:  5px;</string>
          </property>
          <property name="text">
           <string>F10</string>
@@ -421,12 +435,13 @@ padding: 4px;</string>
        <item>
         <widget class="QLabel" name="label">
          <property name="styleSheet">
-          <string notr="true">color: rgb(0, 0, 0);
-background-color: rgb(0, 255, 255);
+          <string notr="true">color:rgb(255, 255, 255);
+background-color: rgb(0, 96, 120);
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
-padding: 4px;</string>
+padding: 4px;
+border-radius:  5px;</string>
          </property>
          <property name="text">
           <string>EXIT</string>
@@ -564,7 +579,7 @@ padding: 4px;</string>
     <string>Copy</string>
    </property>
    <property name="toolTip">
-    <string>Copy (F5)</string>
+    <string>Copy</string>
    </property>
    <property name="shortcut">
     <string>F5</string>
@@ -579,7 +594,7 @@ padding: 4px;</string>
     <string>Rename</string>
    </property>
    <property name="toolTip">
-    <string>Rename (F6)</string>
+    <string>Rename</string>
    </property>
    <property name="shortcut">
     <string>F6</string>
@@ -594,7 +609,7 @@ padding: 4px;</string>
     <string>Delete</string>
    </property>
    <property name="toolTip">
-    <string>Delete (Ctrl-Del)</string>
+    <string>Delete</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Del</string>
@@ -609,7 +624,7 @@ padding: 4px;</string>
     <string>Mkdir</string>
    </property>
    <property name="toolTip">
-    <string>Make directory (F9)</string>
+    <string>Make directory</string>
    </property>
    <property name="shortcut">
     <string>F9</string>
