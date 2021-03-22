@@ -24,11 +24,11 @@ public:
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int lineNumberAreaWidth();
 
-    QString *getFilePath() const;
-    void setFilePath(QString *value);
+//    QString *getFilePath() const;
+//    void setFilePath(QString *value);
 
-    QString getFileToOpen() const;
-    void setFileToOpen(const QString &value);
+//    QString getFileToOpen() const;
+//    void setFileToOpen(const QString &value);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -40,7 +40,7 @@ private slots:
 
 private:
     QWidget *lineNumberArea;
-    QString fileToOpen;
+
 };
 
 

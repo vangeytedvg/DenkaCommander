@@ -1,5 +1,6 @@
 #include "renamewindow.h"
 #include "ui_renamewindow.h"
+#include "codeeditor.h"
 
 /**
  * @brief RenameWindow::RenameWindow
@@ -11,6 +12,7 @@ RenameWindow::RenameWindow(QWidget *parent) :
     ui(new Ui::RenameWindow)
 {
     ui->setupUi(this);
+    CodeEditor c;
 }
 
 /**

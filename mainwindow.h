@@ -6,7 +6,7 @@
 #include <QProgressBar>
 #include <QTreeView>
 #include <QProgressDialog>
-#include "codeeditor.h"
+#include "editor.h"
 
 #define DIALOGRESULTOK 1
 #define DIALOGRESULTCANCEL 0
@@ -55,7 +55,7 @@ private:
     QFileSystemModel *activeModel;
     QProgressDialog *progress;
     int selectedTreeRow = 0;
-//    CodeEditor *ed;
+    Editor *ed;
     void copyFolder(QString sourceFolder, QString destFolder);
     void readSettings();
     void saveSettings();

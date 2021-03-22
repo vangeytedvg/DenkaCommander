@@ -37,8 +37,8 @@ MainWindow::MainWindow(QWidget *parent)
     this->setActiveTreeview(ui->treeLeft);
 
     // Pfew this took some time to make this work
-    connect(this->ui->treeLeft->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
-    connect(this->ui->treeRight->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
+    connect(this->ui->treeLeft->selectionModel(), SIGNAL(currentChanged(const QModelIndex, const QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
+    connect(this->ui->treeRight->selectionModel(), SIGNAL(currentChanged(const QModelIndex, const QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
 }
 
 MainWindow::~MainWindow()
@@ -437,12 +437,11 @@ void MainWindow::on_action_Open_triggered()
             // Like the f"" string in Python:
             QString sbarInfo = QString("Trying to open %1").arg(f.absoluteFilePath());
             ui->statusbar->showMessage(sbarInfo);
-            bool couldOpen = QDesktopServices::openUrl(QUrl::fromLocalFile(f.absoluteFilePath()));
-//            ed = new CodeEditor();
-//            ed->setWindowTitle(QObject::tr("Code Editor Example"));
-//            ed->setFileToOpen(f.baseName());
-//            ed->show();
-
+//            bool couldOpen = QDesktopServices::openUrl(QUrl::fromLocalFile(f.absoluteFilePath()));
+            bool couldOpen = true;
+            ed = new Editor(this);
+            ed->setCurrentFile(f.absoluteFilePath());
+            int res = ed->Open();
             if (!couldOpen) {
                 QMessageBox::critical(this, "Info", "No ascociated application");
             } else {

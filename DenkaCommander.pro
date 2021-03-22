@@ -10,16 +10,19 @@ CONFIG += c++11
 
 SOURCES += \
     codeeditor.cpp \
+    editor.cpp \
     main.cpp \
     mainwindow.cpp \
     renamewindow.cpp
 
 HEADERS += \
     codeeditor.h \
+    editor.h \
     mainwindow.h \
     renamewindow.h
 
 FORMS += \
+    editor.ui \
     mainwindow.ui \
     renamewindow.ui
 

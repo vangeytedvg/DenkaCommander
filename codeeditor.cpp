@@ -64,18 +64,6 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
         updateLineNumberAreaWidth(0);
 }
 
-QString CodeEditor::getFileToOpen() const
-{
-    return fileToOpen;
-}
-
-void CodeEditor::setFileToOpen(const QString &value)
-{
-    fileToOpen = value;
-    this->setWindowTitle(fileToOpen);
-}
-
-
 /**
  * @brief CodeEditor::resizeEvent
  * @param e
@@ -120,7 +108,7 @@ void CodeEditor::highlightCurrentLine()
 void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
     QPainter painter(lineNumberArea);
-    painter.fillRect(event->rect(), Qt::lightGray);
+    painter.fillRect(event->rect(), Qt::cyan);
 
     QTextBlock block = firstVisibleBlock();
     int blockNumber = block.blockNumber();

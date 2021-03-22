@@ -2,6 +2,7 @@
 #define RENAMEWINDOW_H
 
 #include <QDialog>
+#include "codeeditor.h"
 
 namespace Ui {
 class RenameWindow;
@@ -28,6 +29,8 @@ private:
     QString m_MainTitle;
     QString m_Oldname;
     QString m_NewName;
+    CodeEditor *editor;
+
 
     Ui::RenameWindow *ui;
 };
