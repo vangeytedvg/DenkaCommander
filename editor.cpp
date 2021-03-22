@@ -2,6 +2,8 @@
 #include "ui_editor.h"
 #include "codeeditor.h"
 #include <QtDebug>
+#include <QDesktopWidget>
+#include <QScreen>
 
 Editor::Editor(QWidget *parent) :
     QMainWindow(parent),
@@ -11,7 +13,8 @@ Editor::Editor(QWidget *parent) :
     ed = new CodeEditor();
     //ui->hlEditor->addWidget(ed);
     this->setCentralWidget(ed);
-    connect(this->ed, SIGNAL(textChanged()), this, SLOT(on_textChanged()));
+    move(QGuiApplication::screens().at(0)->geometry().center() - frameGeometry().center());
+    connect(ed, SIGNAL(textChanged()), this, SLOT(on_textChanged()));
 }
 
 Editor::~Editor()
@@ -68,6 +71,11 @@ bool Editor::getIsDirty() const
 void Editor::setIsDirty(bool value)
 {
     isDirty = value;
+    if (isDirty) {
+        ui->statusbar->showMessage("File has been changed");
+    } else {
+        ui->statusbar->showMessage("");
+    }
 }
 
 void Editor::saveFile()
