@@ -37,8 +37,8 @@ MainWindow::MainWindow(QWidget *parent)
     this->setActiveTreeview(ui->treeLeft);
 
     // Pfew this took some time to make this work
-    connect(this->ui->treeLeft->selectionModel(), SIGNAL(currentChanged(const QModelIndex, const QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
-    connect(this->ui->treeRight->selectionModel(), SIGNAL(currentChanged(const QModelIndex, const QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
+    connect(this->ui->treeLeft->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
+    connect(this->ui->treeRight->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
 }
 
 MainWindow::~MainWindow()
@@ -442,6 +442,7 @@ void MainWindow::on_action_Open_triggered()
             ed = new Editor(this);
             ed->setCurrentFile(f.absoluteFilePath());
             int res = ed->Open();
+            qDebug() << res;
             if (!couldOpen) {
                 QMessageBox::critical(this, "Info", "No ascociated application");
             } else {

@@ -21,6 +21,20 @@ class Editor : public QMainWindow
 private slots:
     void on_textChanged();
 
+    void on_actionCut_triggered();
+
+    void on_actionCopy_triggered();
+
+    void on_actionPaste_triggered();
+
+    void on_action_Save_triggered();
+
+    void on_actionExit_triggered();
+
+    void on_action_Undo_triggered();
+
+    void on_actionRedo_triggered();
+
 public:
     explicit Editor(QWidget *parent = nullptr);
     ~Editor();
@@ -38,6 +52,7 @@ private:
     CodeEditor *ed;
     QString currentFile;
     bool isDirty = false;
+    void saveFile();
 
 protected:
     void closeEvent(QCloseEvent *event) override;
