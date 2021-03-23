@@ -25,6 +25,7 @@ Editor::~Editor()
 }
 
 void Editor::on_textChanged() {
+    this->texthasChanged(true);
     setIsDirty(true);
 }
 
@@ -34,6 +35,17 @@ void Editor::on_textChanged() {
  */
 int Editor::Open()
 {
+    if (isDirty) {
+        int answer = QMessageBox::warning(this, "Attention", "File content was changed, save?", QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+        if (answer == QMessageBox::Yes) {
+            saveFile();
+        } else if (answer == QMessageBox::Cancel) {
+            return 0;
+        } else if (answer == QMessageBox::No) {
+           ed->clear();
+           this->setIsDirty(false);
+        }
+    }
     /* Check if we have a file paramter set */
     if (currentFile.isEmpty()) {
         return -1;
@@ -52,7 +64,6 @@ int Editor::Open()
     /* Indicate that no changes were made */
     setIsDirty(false);
     return 1;
-
 }
 
 QString Editor::getCurrentFile() const

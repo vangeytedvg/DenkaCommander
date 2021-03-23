@@ -40,12 +40,13 @@ public:
     ~Editor();
 
     int Open();
-
     QString getCurrentFile() const;
     void setCurrentFile(const QString &value);
-
     bool getIsDirty() const;
     void setIsDirty(bool value);
+
+signals:
+    void texthasChanged(bool);
 
 private:
     Ui::Editor *ui;

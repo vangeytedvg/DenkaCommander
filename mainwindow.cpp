@@ -44,15 +44,17 @@ MainWindow::MainWindow(QWidget *parent)
     // Pfew this took some time to make this work
     connect(this->ui->treeLeft->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
     connect(this->ui->treeRight->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
+    ed = new Editor(this);
+    connect(ed, SIGNAL(texthasChanged(bool)), this, SLOT(onChildTextChanged(bool)));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-//    delete ed;
+
 }
 
-/**
+/*
  * @brief Quit the application
  */
 void MainWindow::on_actionE_xit_triggered()
@@ -472,10 +474,13 @@ void MainWindow::on_action_Open_triggered()
             // Like the f"" string in Python:
             // Get the extension of this file
             QString extension = f.suffix();
-
+            /* Now check if this file extension is in our private list */
             if (isInVector(extension)) {
-                ed.setCurrentFile(f.absoluteFilePath());
-                int res = ed.Open();
+                /* passing this, to the constructor makes sure that when the main form is closed, the children will close too */
+//                ed = new Editor(this);
+//                connect(ed)
+                ed->setCurrentFile(f.absoluteFilePath());
+                int res = ed->Open();
                 qDebug() << res;
             } else {
                 QString sbarInfo = QString("Trying to open %1").arg(f.absoluteFilePath());
@@ -562,12 +567,12 @@ void MainWindow::on_actionMkdir_triggered()
         if (selectedIndex.isValid()) {
             QString thePath = activeModel->fileInfo(selectedIndex).absoluteFilePath();            
             mkdirWindow = new MkdirWindow();
-            mkdirWindow->setParentFolder(thePath);
+            mkdirWindow->setParentFolder(QDir::cleanPath(thePath));
             int result = mkdirWindow->exec();
             if (result == DIALOGRESULTOK) {
                 // Go to the path
                 QDir current(thePath);
-                if (!current.mkdir(mkdirWindow->getNewFoldername())) {
+                if (!current.mkdir(QDir::cleanPath(mkdirWindow->getNewFoldername()))) {
                     QMessageBox::warning(this,"MKDIR", "Could not create new subfolder!");
                 }
             }
@@ -592,8 +597,10 @@ void MainWindow::on_actionDelete_triggered()
     if (selection.isFile()) {
         qDebug() << "a File";
         QFile f(thePath);
-        if (f.remove()) {
-            QMessageBox::information(this, "Delete", "File has been removed");
+        if (QMessageBox::question(this,"Delete file", "Delete " + thePath + "?", QMessageBox::Yes|QMessageBox::Cancel)==QMessageBox::Yes) {
+            if (f.remove()) {
+                QMessageBox::information(this, "Delete", "File has been removed");
+            }
         }
     } else if (selection.isDir()) {
         if (QMessageBox::warning(this, "Delete", "Delete this folder?", QMessageBox::Yes|QMessageBox::Cancel)==QMessageBox::Yes) {
@@ -605,4 +612,9 @@ void MainWindow::on_actionDelete_triggered()
             }
         }
     }
+}
+
+void MainWindow::onChildTextChanged(bool state)
+{
+    qDebug() << "HAHAHAHAH " << state;
 }

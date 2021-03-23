@@ -29,7 +29,6 @@ public:
 
     void setActiveTreeview(QTreeView *ActiveTreeview);
 
-
     QFileSystemModel *getActiveModel() const;
     void setActiveModel(QFileSystemModel *value);
 
@@ -44,15 +43,11 @@ private slots:
     void on_treeLeft_clicked(const QModelIndex &index);
     void on_treeRight_clicked(const QModelIndex &index);
     void on_TreeSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
-
     void on_action_Open_triggered();
-
     void on_actionRename_triggered();
-
-
     void on_actionMkdir_triggered();
-
     void on_actionDelete_triggered();
+    void onChildTextChanged(bool state);
 
 private:
     Ui::MainWindow *ui;
@@ -62,7 +57,7 @@ private:
     QFileSystemModel *activeModel;
     QProgressDialog *progress;
     int selectedTreeRow = 0;
-    Editor ed;
+    Editor *ed;
     RenameWindow *renameWindow;
     MkdirWindow *mkdirWindow;
     void copyFolder(QString sourceFolder, QString destFolder);
