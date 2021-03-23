@@ -40,8 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
     readSettings();
     setActiveModel(NULL);
     setActiveTreeview(ui->treeLeft);
-
-    //this->addExtensions();
+    this->addExtensions();
     // Pfew this took some time to make this work
     connect(this->ui->treeLeft->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
     connect(this->ui->treeRight->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
@@ -68,12 +67,27 @@ void MainWindow::on_actionE_xit_triggered()
  */
 void MainWindow::addExtensions()
 {
-    extensions->append("txt");
-    extensions->append("py");
-    extensions->append("js");
-    extensions->append("cpp");
-    extensions->append("sh");
-    extensions->append("cs");
+    extensions.append("txt");
+    extensions.append("py");
+    extensions.append("js");
+    extensions.append("cpp");
+    extensions.append("sh");
+    extensions.append("cs");
+}
+
+bool MainWindow::isInVector(QString extension)
+{
+    // Check if this extension is in the commander editor list
+    qDebug() << "isInVector called " << extension;
+    bool result = false;
+    for (int i = 0; i < extensions.size(); i++) {
+        qDebug() << "MPP" << extensions.at(i);
+        if (extensions.at(i) == extension) {
+            result = true;
+        }
+    }
+    qDebug() << " Result " << result;
+    return result;
 }
 
 /**
@@ -297,7 +311,6 @@ void MainWindow::on_actionCopy_directory_triggered()
                             return;
                         }
                     }
-
                     this->progress = new QProgressDialog(this);
                     this->progress->setMaximum(this->m_totalNrOfFiles);
                     this->progress->setWindowTitle("Copying files");
@@ -306,10 +319,10 @@ void MainWindow::on_actionCopy_directory_triggered()
                     ui->statusbar->showMessage(info + " file(s) copied to target directory!", 5000);
                     this->progress->hide();
                     delete this->progress;
-                } else {
+                } else if(this->model_left) {
                     // Must be a file if we get here, get the base filename
                     QFileInfo fi(leftPath);
-                    QString absPath = fi.baseName();
+                    QString absPath = fi.fileName();
                     QString targetPath = rightPath + QDir::separator() + absPath;
                     qDebug() << leftPath << " -> " << rightPath << " --> " << absPath;
                     if (QFile::exists(targetPath)) {
@@ -460,22 +473,24 @@ void MainWindow::on_action_Open_triggered()
             // Get the extension of this file
             QString extension = f.suffix();
 
-            QString sbarInfo = QString("Trying to open %1").arg(f.absoluteFilePath());
-            ui->statusbar->showMessage(sbarInfo);
-//            bool couldOpen = QDesktopServices::openUrl(QUrl::fromLocalFile(f.absoluteFilePath()));
-            bool couldOpen = true;
-            ed = new Editor(this);
-            ed->setCurrentFile(f.absoluteFilePath());
-            int res = ed->Open();
-            qDebug() << res;
-            if (!couldOpen) {
-                QMessageBox::critical(this, "Info", "No ascociated application");
+            if (isInVector(extension)) {
+                ed.setCurrentFile(f.absoluteFilePath());
+                int res = ed.Open();
+                qDebug() << res;
             } else {
-                ui->statusbar->showMessage("File opening", 2000);
+                QString sbarInfo = QString("Trying to open %1").arg(f.absoluteFilePath());
+                ui->statusbar->showMessage(sbarInfo);
+                bool couldOpen = QDesktopServices::openUrl(QUrl::fromLocalFile(f.absoluteFilePath()));
+
+                qDebug() << couldOpen;
+                if (!couldOpen) {
+                    QMessageBox::critical(this, "Info", "No ascociated application");
+                } else {
+                    ui->statusbar->showMessage("File opening", 2000);
+                }
             }
         }
     }
-
 }
 
 /**

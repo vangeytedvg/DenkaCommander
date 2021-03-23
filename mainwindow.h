@@ -62,7 +62,7 @@ private:
     QFileSystemModel *activeModel;
     QProgressDialog *progress;
     int selectedTreeRow = 0;
-    Editor *ed;
+    Editor ed;
     RenameWindow *renameWindow;
     MkdirWindow *mkdirWindow;
     void copyFolder(QString sourceFolder, QString destFolder);
@@ -78,7 +78,8 @@ private:
     long m_filesCopied = 0;
     long m_totalCopied = 0;
     void addExtensions();
-    QVector<QString> *extensions;
+    bool isInVector(QString extension);
+    QVector<QString> extensions;
 
 protected:
     void closeEvent(QCloseEvent *event) override;
