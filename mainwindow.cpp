@@ -16,25 +16,29 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->currentPath.clear();
-    this->setWindowTitle("Denka Commander");
+    currentPath.clear();
+    setWindowTitle("Denka Commander");
     // Left side browser
-    this->model_left = new QFileSystemModel();
+    model_left = new QFileSystemModel();
     this->model_left->setRootPath(QDir::rootPath());
+    //model_left->setRootPath(model_left->myComputer().toString());
     ui->treeLeft->setModel(this->model_left);
-    ui->treeLeft->setRootIndex(this->model_left->index(QDir::homePath()));
-    this->model_left->sort(0, Qt::AscendingOrder);
+    //ui->treeLeft->setRootIndex(this->model_left->index(0));
+    ui->treeLeft->setRootIndex(this->model_left->index("home"));
+    ui->treeLeft->expandRecursively(QModelIndex(this->model_left->index(0)));
+    ui->treeLeft->expand(QModelIndex(this->model_left->index("home")));
+    model_left->sort(0, Qt::AscendingOrder);
     // Nothing selected on the left!
     ui->treeLeft->setCurrentIndex(this->model_left->index(0));
     // Right side browser
-    this->model_right = new QFileSystemModel();
-    this->model_right->setRootPath(QDir::homePath());
+    model_right = new QFileSystemModel();
+    model_right->setRootPath(QDir::homePath());
     ui->treeRight->setModel(this->model_right);
-    this->model_right->sort(0, Qt::AscendingOrder);
+    model_right->sort(0, Qt::AscendingOrder);
     ui->treeRight->setRootIndex(this->model_right->index(QDir::homePath()));
-    this->readSettings();
-    this->setActiveModel(NULL);
-    this->setActiveTreeview(ui->treeLeft);
+    readSettings();
+    setActiveModel(NULL);
+    setActiveTreeview(ui->treeLeft);
 
     // Pfew this took some time to make this work
     connect(this->ui->treeLeft->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
@@ -512,4 +516,47 @@ bool MainWindow::renameDir(const QString &oldName, const QString &newName) {
         QMessageBox::information(this, "Rename", "Could not rename the file!");
     }
     return rc;
+}
+
+/**
+ * @brief MainWindow::on_actionMkdir_triggered
+ * Create a new subdirectory
+ */
+void MainWindow::on_actionMkdir_triggered()
+{
+    if (this->ActiveTreeview() != nullptr) {
+        qDebug() << "MKDIR called";
+        QModelIndex selectedIndex = m_ActiveTreeview->currentIndex();
+        if (selectedIndex.isValid()) {
+            QString thePath = activeModel->fileInfo(selectedIndex).absoluteFilePath();
+            // Obtain info about the selection
+            QFileInfo f(thePath);
+            RenameWindow w;
+            if (f.isDir()) {
+                // We are renaming a directory here
+                w.setMainTitle("MKDIR : " + activeModel->fileInfo(selectedIndex).baseName());
+            } else {
+                QMessageBox::information(this, "MKDIR", "Selection is not a folder");
+                return;
+            }
+            w.setOldname(thePath);
+            w.setNewName(activeModel->fileInfo(selectedIndex).filePath());
+            int result = w.exec();
+            if (result == DIALOGRESULTOK) {
+                // Try to rename the file
+                QFile f(w.NewName());
+                if (f.exists()) {
+                    QMessageBox::warning(this, "Rename", "Such a file/folder already exists!");
+                    return;
+                }
+                try {
+                    renameDir(thePath, w.NewName());
+                }  catch (...) {
+                    QMessageBox::warning(this, "Rename", "An error occured!");
+                }
+            }
+        }
+    } else {
+        QMessageBox::information(this, "Rename", "Please select a file or folder to rename!");
+    }
 }

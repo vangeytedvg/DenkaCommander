@@ -13,6 +13,8 @@ Editor::Editor(QWidget *parent) :
     ed = new CodeEditor();
     //ui->hlEditor->addWidget(ed);
     this->setCentralWidget(ed);
+    QFont fira("Fira Code", 11, QFont::Normal);
+    ed->setFont(fira);
     move(QGuiApplication::screens().at(0)->geometry().center() - frameGeometry().center());
     connect(ed, SIGNAL(textChanged()), this, SLOT(on_textChanged()));
 }
@@ -102,8 +104,10 @@ void Editor::closeEvent(QCloseEvent *event)
         if (answer == QMessageBox::No) {
             ui->statusbar->showMessage("Copy cancelled...", 5000);
             event->accept();
-        } else {           
+        } else if (answer == QMessageBox::Yes) {
             saveFile();
+        } else if (answer == QMessageBox::Cancel) {
+            event->ignore();
         }
     }
 }

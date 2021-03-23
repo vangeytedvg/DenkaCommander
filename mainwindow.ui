@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="images.qrc">
+    <normaloff>:/imgs/folder-4.png</normaloff>:/imgs/folder-4.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
@@ -129,7 +133,7 @@
          </property>
          <property name="styleSheet">
           <string notr="true">color:rgb(0,0,0);
-background-color: #c9c734;
+background-color: #d6bb40;
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
@@ -186,7 +190,7 @@ border-radius:  5px;</string>
         <widget class="QLabel" name="label_F2_3">
          <property name="styleSheet">
           <string notr="true">color:rgb(0,0,0);
-background-color: #c9c734;
+background-color: #d6bb40;
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
@@ -225,7 +229,7 @@ border-radius:  5px;</string>
         <widget class="QLabel" name="label_F2_4">
          <property name="styleSheet">
           <string notr="true">color:rgb(0,0,0);
-background-color: #c9c734;
+background-color: #d6bb40;
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
@@ -264,7 +268,7 @@ border-radius:  5px;</string>
         <widget class="QLabel" name="label_F2_5">
          <property name="styleSheet">
           <string notr="true">color:rgb(0,0,0);
-background-color: #c9c734;
+background-color: #d6bb40;
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
@@ -303,7 +307,7 @@ border-radius:  5px;</string>
         <widget class="QLabel" name="label_F2_6">
          <property name="styleSheet">
           <string notr="true">color:rgb(0,0,0);
-background-color: #c9c734;
+background-color: #d6bb40;
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
@@ -342,7 +346,7 @@ border-radius:  5px;</string>
         <widget class="QLabel" name="label_F2_7">
          <property name="styleSheet">
           <string notr="true">color:rgb(0,0,0);
-background-color: #c9c734;
+background-color: #d6bb40;
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
@@ -381,7 +385,7 @@ border-radius:  5px;</string>
         <widget class="QLabel" name="label_F2_8">
          <property name="styleSheet">
           <string notr="true">color:rgb(0,0,0);
-background-color: #c9c734;
+background-color: #d6bb40;
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
@@ -420,7 +424,7 @@ border-radius:  5px;</string>
         <widget class="QLabel" name="label_F2_9">
          <property name="styleSheet">
           <string notr="true">color:rgb(0,0,0);
-background-color: #c9c734;
+background-color: #d6bb40;
 font: bold;
 border: 0px solid #242322;
 spacing: 0px;
@@ -506,9 +510,17 @@ border-radius:  5px;</string>
     <addaction name="actionDelete"/>
     <addaction name="separator"/>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="action_About_Denka_Commander"/>
+    <addaction name="actionAbout_Qt5"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Tree"/>
    <addaction name="menuActions"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -640,6 +652,16 @@ border-radius:  5px;</string>
    </property>
    <property name="shortcut">
     <string>F7</string>
+   </property>
+  </action>
+  <action name="action_About_Denka_Commander">
+   <property name="text">
+    <string>&amp;About Denka Commander</string>
+   </property>
+  </action>
+  <action name="actionAbout_Qt5">
+   <property name="text">
+    <string>About &amp;Qt5</string>
    </property>
   </action>
  </widget>

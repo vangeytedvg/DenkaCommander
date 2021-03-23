@@ -48,6 +48,8 @@ private slots:
     void on_actionRename_triggered();
 
 
+    void on_actionMkdir_triggered();
+
 private:
     Ui::MainWindow *ui;
     QString currentPath = "";

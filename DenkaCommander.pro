@@ -13,17 +13,20 @@ SOURCES += \
     editor.cpp \
     main.cpp \
     mainwindow.cpp \
+    mkdirwindow.cpp \
     renamewindow.cpp
 
 HEADERS += \
     codeeditor.h \
     editor.h \
     mainwindow.h \
+    mkdirwindow.h \
     renamewindow.h
 
 FORMS += \
     editor.ui \
     mainwindow.ui \
+    mkdirwindow.ui \
     renamewindow.ui
 
 TRANSLATIONS += \
