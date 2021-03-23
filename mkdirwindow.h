@@ -4,19 +4,27 @@
 #include <QDialog>
 
 namespace Ui {
-class mkdirwindow;
+class MkdirWindow;
 }
 
-class mkdirwindow : public QDialog
+class MkdirWindow : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit mkdirwindow(QWidget *parent = nullptr);
-    ~mkdirwindow();
+    explicit MkdirWindow(QWidget *parent = nullptr);
+    ~MkdirWindow();
+
+    QString getParentFolder() const;
+    void setParentFolder(const QString &value);
+
+    QString getNewFoldername();
+    void setNewFoldername(const QString &value);
 
 private:
-    Ui::mkdirwindow *ui;
+    Ui::MkdirWindow *ui;
+    QString parentFolder;
+    QString newFoldername;
 };
 
 #endif // MKDIRWINDOW_H

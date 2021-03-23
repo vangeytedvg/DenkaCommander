@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "renamewindow.h"
+#include "mkdirwindow.h"
 #include "codeeditor.h"
 #include <QDebug>
 #include <QMessageBox>
@@ -40,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
     setActiveModel(NULL);
     setActiveTreeview(ui->treeLeft);
 
+    //this->addExtensions();
     // Pfew this took some time to make this work
     connect(this->ui->treeLeft->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
     connect(this->ui->treeRight->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
@@ -57,6 +59,21 @@ MainWindow::~MainWindow()
 void MainWindow::on_actionE_xit_triggered()
 {  
     close();
+}
+
+/**
+ * @brief MainWindow::addExtensions
+ * The extensions vector contains the extensions the
+ * internal editor will handle
+ */
+void MainWindow::addExtensions()
+{
+    extensions->append("txt");
+    extensions->append("py");
+    extensions->append("js");
+    extensions->append("cpp");
+    extensions->append("sh");
+    extensions->append("cs");
 }
 
 /**
@@ -419,6 +436,7 @@ void MainWindow::on_treeRight_clicked(const QModelIndex &index)
 {
     if (index.isValid()) {
         setActiveTreeview(ui->treeRight);
+        setActiveModel(model_right);
     }
 }
 
@@ -439,6 +457,9 @@ void MainWindow::on_action_Open_triggered()
                 return;
             }
             // Like the f"" string in Python:
+            // Get the extension of this file
+            QString extension = f.suffix();
+
             QString sbarInfo = QString("Trying to open %1").arg(f.absoluteFilePath());
             ui->statusbar->showMessage(sbarInfo);
 //            bool couldOpen = QDesktopServices::openUrl(QUrl::fromLocalFile(f.absoluteFilePath()));
@@ -470,29 +491,27 @@ void MainWindow::on_actionRename_triggered()
             QString thePath = activeModel->fileInfo(selectedIndex).absoluteFilePath();
             // Obtain info about the selection
             QFileInfo f(thePath);
-            RenameWindow w;
+
+            renameWindow = new RenameWindow();
             if (f.isDir()) {
                 // We are renaming a directory here
-                w.setMainTitle("Rename folder : " + activeModel->fileInfo(selectedIndex).baseName());
+                renameWindow->setMainTitle("Rename folder : " + activeModel->fileInfo(selectedIndex).baseName());
             } else if (f.isFile()) {
-                w.setMainTitle("Rename file : " + activeModel->fileInfo(selectedIndex).baseName());
+                renameWindow->setMainTitle("Rename file : " + activeModel->fileInfo(selectedIndex).baseName());
             }
-            w.setOldname(thePath);
-            w.setNewName(activeModel->fileInfo(selectedIndex).filePath());
-            int result = w.exec();
+            renameWindow->setOldname(thePath);
+            renameWindow->setNewName(activeModel->fileInfo(selectedIndex).filePath());
+            int result = renameWindow->exec();
             if (result == DIALOGRESULTOK) {
                 // Try to rename the file
-                QFile f(w.NewName());
+                QFile f(renameWindow->NewName());
                 if (f.exists()) {
                     QMessageBox::warning(this, "Rename", "Such a file/folder already exists!");
                     return;
                 }
-                try {
-                    renameDir(thePath, w.NewName());
-                }  catch (...) {
-                    QMessageBox::warning(this, "Rename", "An error occured!");
-                }
+                renameDir(thePath, renameWindow->NewName());
             }
+            delete renameWindow;
         }
     } else {
         QMessageBox::information(this, "Rename", "Please select a file or folder to rename!");
@@ -511,11 +530,10 @@ bool MainWindow::renameDir(const QString &oldName, const QString &newName) {
     QString src = QDir::cleanPath(oldName);
     QString dst = QDir::cleanPath(newName);
     // Rename
-    bool rc = QFile::rename(src, dst);
-    if (!rc) {
+    if (!QFile::rename(src, dst)) {
         QMessageBox::information(this, "Rename", "Could not rename the file!");
     }
-    return rc;
+    return true;
 }
 
 /**
@@ -525,38 +543,51 @@ bool MainWindow::renameDir(const QString &oldName, const QString &newName) {
 void MainWindow::on_actionMkdir_triggered()
 {
     if (this->ActiveTreeview() != nullptr) {
-        qDebug() << "MKDIR called";
         QModelIndex selectedIndex = m_ActiveTreeview->currentIndex();
         if (selectedIndex.isValid()) {
-            QString thePath = activeModel->fileInfo(selectedIndex).absoluteFilePath();
-            // Obtain info about the selection
-            QFileInfo f(thePath);
-            RenameWindow w;
-            if (f.isDir()) {
-                // We are renaming a directory here
-                w.setMainTitle("MKDIR : " + activeModel->fileInfo(selectedIndex).baseName());
-            } else {
-                QMessageBox::information(this, "MKDIR", "Selection is not a folder");
-                return;
-            }
-            w.setOldname(thePath);
-            w.setNewName(activeModel->fileInfo(selectedIndex).filePath());
-            int result = w.exec();
+            QString thePath = activeModel->fileInfo(selectedIndex).absoluteFilePath();            
+            mkdirWindow = new MkdirWindow();
+            mkdirWindow->setParentFolder(thePath);
+            int result = mkdirWindow->exec();
             if (result == DIALOGRESULTOK) {
-                // Try to rename the file
-                QFile f(w.NewName());
-                if (f.exists()) {
-                    QMessageBox::warning(this, "Rename", "Such a file/folder already exists!");
-                    return;
-                }
-                try {
-                    renameDir(thePath, w.NewName());
-                }  catch (...) {
-                    QMessageBox::warning(this, "Rename", "An error occured!");
+                // Go to the path
+                QDir current(thePath);
+                if (!current.mkdir(mkdirWindow->getNewFoldername())) {
+                    QMessageBox::warning(this,"MKDIR", "Could not create new subfolder!");
                 }
             }
+            delete mkdirWindow;
         }
     } else {
-        QMessageBox::information(this, "Rename", "Please select a file or folder to rename!");
+        QMessageBox::information(this, "MKDIR", "Please select a folder to create a subfolder in!");
+    }
+}
+
+/**
+ * @brief MainWindow::on_actionDelete_triggered
+ * Remove the selected file/folder
+ */
+void MainWindow::on_actionDelete_triggered()
+{
+    /* Check if selection is file or folder */
+    QModelIndex selectedIndex = m_ActiveTreeview->currentIndex();
+    QString thePath = activeModel->fileInfo(selectedIndex).absoluteFilePath();
+    // Obtain info about the selection
+    QFileInfo selection(thePath);
+    if (selection.isFile()) {
+        qDebug() << "a File";
+        QFile f(thePath);
+        if (f.remove()) {
+            QMessageBox::information(this, "Delete", "File has been removed");
+        }
+    } else if (selection.isDir()) {
+        if (QMessageBox::warning(this, "Delete", "Delete this folder?", QMessageBox::Yes|QMessageBox::Cancel)==QMessageBox::Yes) {
+            QDir s(thePath);
+            if (!s.removeRecursively()) {
+                QMessageBox::warning(this, "Delete", "Could not complete removal!");
+            } else {
+                QMessageBox::information(this, "Delete", "Folder removed!");
+            }
+        }
     }
 }

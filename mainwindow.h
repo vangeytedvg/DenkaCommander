@@ -7,6 +7,8 @@
 #include <QTreeView>
 #include <QProgressDialog>
 #include "editor.h"
+#include "renamewindow.h"
+#include "mkdirwindow.h"
 
 #define DIALOGRESULTOK 1
 #define DIALOGRESULTCANCEL 0
@@ -50,6 +52,8 @@ private slots:
 
     void on_actionMkdir_triggered();
 
+    void on_actionDelete_triggered();
+
 private:
     Ui::MainWindow *ui;
     QString currentPath = "";
@@ -59,6 +63,8 @@ private:
     QProgressDialog *progress;
     int selectedTreeRow = 0;
     Editor *ed;
+    RenameWindow *renameWindow;
+    MkdirWindow *mkdirWindow;
     void copyFolder(QString sourceFolder, QString destFolder);
     void readSettings();
     void saveSettings();
@@ -71,6 +77,8 @@ private:
     long m_totalNrOfFiles = 0;
     long m_filesCopied = 0;
     long m_totalCopied = 0;
+    void addExtensions();
+    QVector<QString> *extensions;
 
 protected:
     void closeEvent(QCloseEvent *event) override;
