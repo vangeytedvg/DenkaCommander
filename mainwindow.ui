@@ -495,7 +495,7 @@ border-radius:  5px;</string>
    </widget>
    <widget class="QMenu" name="menu_Tree">
     <property name="title">
-     <string>&amp;Tree</string>
+     <string>T&amp;ree</string>
     </property>
     <addaction name="action_Expand_all"/>
     <addaction name="action_Collapse_all"/>
@@ -517,9 +517,16 @@ border-radius:  5px;</string>
     <addaction name="action_About_Denka_Commander"/>
     <addaction name="actionAbout_Qt5"/>
    </widget>
+   <widget class="QMenu" name="menu_Tools">
+    <property name="title">
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="action_Options"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Tree"/>
    <addaction name="menuActions"/>
+   <addaction name="menu_Tools"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -662,6 +669,11 @@ border-radius:  5px;</string>
   <action name="actionAbout_Qt5">
    <property name="text">
     <string>About &amp;Qt5</string>
+   </property>
+  </action>
+  <action name="action_Options">
+   <property name="text">
+    <string>&amp;Options</string>
    </property>
   </action>
  </widget>

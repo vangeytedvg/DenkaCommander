@@ -9,22 +9,28 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    aboutform.cpp \
     codeeditor.cpp \
     editor.cpp \
+    extensionseditor.cpp \
     main.cpp \
     mainwindow.cpp \
     mkdirwindow.cpp \
     renamewindow.cpp
 
 HEADERS += \
+    aboutform.h \
     codeeditor.h \
     editor.h \
+    extensionseditor.h \
     mainwindow.h \
     mkdirwindow.h \
     renamewindow.h
 
 FORMS += \
+    aboutform.ui \
     editor.ui \
+    extensionseditor.ui \
     mainwindow.ui \
     mkdirwindow.ui \
     renamewindow.ui

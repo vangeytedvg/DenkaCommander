@@ -39,11 +39,14 @@ int Editor::Open()
         int answer = QMessageBox::warning(this, "Attention", "File content was changed, save?", QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
         if (answer == QMessageBox::Yes) {
             saveFile();
+            emit texthasChanged(false);
+            this->setIsDirty(false);
         } else if (answer == QMessageBox::Cancel) {
             return 0;
         } else if (answer == QMessageBox::No) {
            ed->clear();
            this->setIsDirty(false);
+           emit texthasChanged(false);
         }
     }
     /* Check if we have a file paramter set */
@@ -63,6 +66,7 @@ int Editor::Open()
     show();
     /* Indicate that no changes were made */
     setIsDirty(false);
+    emit texthasChanged(false);
     return 1;
 }
 
@@ -84,6 +88,7 @@ bool Editor::getIsDirty() const
 void Editor::setIsDirty(bool value)
 {
     isDirty = value;
+    emit texthasChanged(value);
     if (isDirty) {
         ui->statusbar->showMessage("File has been changed");
     } else {
@@ -106,6 +111,7 @@ void Editor::saveFile()
     out << text;
     file.close();
     setIsDirty(false);
+    emit texthasChanged(false);
 }
 
 void Editor::closeEvent(QCloseEvent *event)
@@ -113,10 +119,15 @@ void Editor::closeEvent(QCloseEvent *event)
     if (isDirty) {
         int answer = QMessageBox::warning(this, "Attention", "File content was changed, save?", QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
         if (answer == QMessageBox::No) {
-            ui->statusbar->showMessage("Copy cancelled...", 5000);
-            event->accept();
+            ui->statusbar->showMessage("Close cancelled...", 5000);
+            emit texthasChanged(false);
+            this->setIsDirty(false);
+            event->accept();            
         } else if (answer == QMessageBox::Yes) {
+            emit texthasChanged(false);
+            this->setIsDirty(false);
             saveFile();
+            event->accept();
         } else if (answer == QMessageBox::Cancel) {
             event->ignore();
         }

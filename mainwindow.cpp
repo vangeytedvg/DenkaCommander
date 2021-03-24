@@ -1,16 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "renamewindow.h"
-#include "mkdirwindow.h"
-#include "codeeditor.h"
-#include <QDebug>
-#include <QMessageBox>
-#include <QFile>
-#include <QModelIndex>
-#include <QCloseEvent>
-#include <QSettings>
-#include <QDesktopWidget>
-#include <QDesktopServices>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -21,37 +10,47 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("Denka Commander");
     // Left side browser
     model_left = new QFileSystemModel();
-    this->model_left->setRootPath(QDir::rootPath());
-    //model_left->setRootPath(model_left->myComputer().toString());
-    ui->treeLeft->setModel(this->model_left);
-    //ui->treeLeft->setRootIndex(this->model_left->index(0));
-    ui->treeLeft->setRootIndex(this->model_left->index("home"));
-    ui->treeLeft->expandRecursively(QModelIndex(this->model_left->index(0)));
-    ui->treeLeft->expand(QModelIndex(this->model_left->index("home")));
+    model_left->setRootPath(QDir::rootPath());
+
+    // Context menu for treeLeft
+    ui->treeLeft->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->treeLeft, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
+
+    ui->treeLeft->setModel(model_left);
+    ui->treeLeft->setRootIndex(model_left->index("home"));
+    ui->treeLeft->expandRecursively(QModelIndex(model_left->index(0)));
+    ui->treeLeft->expand(QModelIndex(model_left->index("home")));
     model_left->sort(0, Qt::AscendingOrder);
-    // Nothing selected on the left!
-    ui->treeLeft->setCurrentIndex(this->model_left->index(0));
+    ui->treeLeft->setCurrentIndex(model_left->index(0));
+
     // Right side browser
+    // Context menu for treeRight
+    ui->treeRight->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->treeRight, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
+
+
     model_right = new QFileSystemModel();
     model_right->setRootPath(QDir::homePath());
-    ui->treeRight->setModel(this->model_right);
+    ui->treeRight->setModel(model_right);
     model_right->sort(0, Qt::AscendingOrder);
-    ui->treeRight->setRootIndex(this->model_right->index(QDir::homePath()));
+    ui->treeRight->setRootIndex(model_right->index(QDir::homePath()));
     readSettings();
     setActiveModel(NULL);
     setActiveTreeview(ui->treeLeft);
-    this->addExtensions();
+    addExtensions();
+
     // Pfew this took some time to make this work
-    connect(this->ui->treeLeft->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
-    connect(this->ui->treeRight->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
+    connect(ui->treeLeft->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
+    connect(ui->treeRight->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
+
     ed = new Editor(this);
     connect(ed, SIGNAL(texthasChanged(bool)), this, SLOT(onChildTextChanged(bool)));
+    canClose=true;
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-
 }
 
 /*
@@ -75,6 +74,8 @@ void MainWindow::addExtensions()
     extensions.append("cpp");
     extensions.append("sh");
     extensions.append("cs");
+    extensions.append("xml");
+    extensions.append("json");
 }
 
 bool MainWindow::isInVector(QString extension)
@@ -82,14 +83,45 @@ bool MainWindow::isInVector(QString extension)
     // Check if this extension is in the commander editor list
     qDebug() << "isInVector called " << extension;
     bool result = false;
-    for (int i = 0; i < extensions.size(); i++) {
-        qDebug() << "MPP" << extensions.at(i);
-        if (extensions.at(i) == extension) {
+    // foreach is a Qt macro
+    foreach(QString h, extensions) {
+        if (h == extension) {
             result = true;
         }
     }
     qDebug() << " Result " << result;
     return result;
+}
+
+void MainWindow::verifySelection()
+{
+    QModelIndex selectedIndex = this->m_ActiveTreeview->currentIndex();
+    QString filePath = activeModel->fileInfo(selectedIndex).absoluteFilePath();
+    QFileInfo pathInfo(filePath);
+    if (pathInfo.isExecutable()) {
+        ui->actionMkdir->setEnabled(false);
+        ui->action_Open->setEnabled(false);
+    }
+    if (pathInfo.isDir()) {
+        // Can't edit a folder
+        ui->action_Open->setEnabled(false);
+        ui->actionMkdir->setEnabled(true);
+    }
+    if (pathInfo.isFile()) {
+        ui->actionMkdir->setEnabled(false);
+        ui->action_Open->setEnabled(true);
+    }
+
+}
+
+bool MainWindow::getCanClose() const
+{
+    return canClose;
+}
+
+void MainWindow::setCanClose(bool value)
+{
+    canClose = value;
 }
 
 /**
@@ -99,8 +131,6 @@ bool MainWindow::isInVector(QString extension)
  * @param previous
  */
 void MainWindow::on_TreeSelectionChanged(const QModelIndex &current, const QModelIndex &previous) {
-    setSelectedTreeRow(current.row());
-    //qDebug() << "Kwak" << " " << current << " " << previous << getSelectedTreeRow();
 }
 
 /**
@@ -157,12 +187,8 @@ void MainWindow::setSelectedTreeRow(int value)
  * @brief MainWindow::closeEvent Overrides the close event of this form.
  * @param event
  */
-void MainWindow::closeEvent(QCloseEvent *event) {
-//    if (ed) {
-//        ed->close();
-//    }
+void MainWindow::closeEvent(QCloseEvent *event) {    
     saveSettings();
-    event->accept();
 }
 
 /**
@@ -183,6 +209,47 @@ void MainWindow::setActiveModel(QFileSystemModel *value)
     activeModel = value;
 }
 
+
+void MainWindow::customMenuRequested(QPoint pos)
+{
+    QModelIndex index = this->ActiveTreeview()->indexAt(pos);
+    QMenu *menu = new QMenu(this);
+    QAction *copyFileOrFolder = new QAction("Copy", this);
+    QAction *renameFileOrFolder = new QAction("Rename", this);
+    QAction *deleteFileOrFolder = new QAction("Delete", this);
+    QAction *openFile = new QAction("Open", this);
+    QAction *mkDir = new QAction("Mkdir", this);
+    // Add custom menu actions
+    menu->addAction(copyFileOrFolder);
+    menu->addAction(renameFileOrFolder);
+    menu->addAction(deleteFileOrFolder);
+    menu->addAction(openFile);
+    menu->addAction(mkDir);
+    // connect signals and slots
+    connect(renameFileOrFolder, SIGNAL(triggered()), this, SLOT(on_actionRename_triggered()));
+    connect(copyFileOrFolder, SIGNAL(triggered()), this, SLOT(on_actionCopy_directory_triggered()));
+    connect(deleteFileOrFolder, SIGNAL(triggered()), this, SLOT(on_actionDelete_triggered()));
+    connect(openFile, SIGNAL(triggered()), this, SLOT(on_action_Open_triggered()));
+    connect(mkDir, SIGNAL(triggered()), this, SLOT(on_actionMkdir_triggered()));
+    // Do some housekeeping based on the type of file
+    QString filePath = activeModel->fileInfo(index).absoluteFilePath();
+    QFileInfo pathInfo(filePath);
+    if (pathInfo.isExecutable()) {
+        mkDir->setEnabled(false);
+        openFile->setEnabled(false);
+    }
+    if (pathInfo.isDir()) {
+        // Can't edit a folder
+        openFile->setEnabled(false);
+        mkDir->setEnabled(true);
+    }
+    if (pathInfo.isFile()) {
+        mkDir->setEnabled(false);
+        openFile->setEnabled(true);
+    }
+    // Activate the context menu
+    menu->popup(ActiveTreeview()->viewport()->mapToGlobal(pos));
+}
 
 /**
  * @brief Write the settings of the form to the .conf file
@@ -439,6 +506,8 @@ void MainWindow::on_treeLeft_clicked(const QModelIndex &index)
         setActiveTreeview(ui->treeLeft);
         setActiveModel(model_left);
     }
+    verifySelection();
+
 }
 
 /**
@@ -453,6 +522,7 @@ void MainWindow::on_treeRight_clicked(const QModelIndex &index)
         setActiveTreeview(ui->treeRight);
         setActiveModel(model_right);
     }
+    verifySelection();
 }
 
 /**
@@ -476,9 +546,6 @@ void MainWindow::on_action_Open_triggered()
             QString extension = f.suffix();
             /* Now check if this file extension is in our private list */
             if (isInVector(extension)) {
-                /* passing this, to the constructor makes sure that when the main form is closed, the children will close too */
-//                ed = new Editor(this);
-//                connect(ed)
                 ed->setCurrentFile(f.absoluteFilePath());
                 int res = ed->Open();
                 qDebug() << res;
@@ -614,7 +681,61 @@ void MainWindow::on_actionDelete_triggered()
     }
 }
 
+/**
+ * @brief MainWindow::onChildTextChanged
+ * Depending on the state of the child editor decide if we can close or not
+ * @param state
+ */
 void MainWindow::onChildTextChanged(bool state)
 {
-    qDebug() << "HAHAHAHAH " << state;
+    qDebug() << "TETTERKEN " << state;
+    setCanClose(state);
+    qDebug() << "TUTTER " << canClose;
+}
+
+
+
+void MainWindow::on_treeLeft_entered(const QModelIndex &index)
+{
+    if (index.isValid()) {
+        setActiveTreeview(ui->treeLeft);
+        setActiveModel(model_left);
+    }
+}
+
+void MainWindow::on_treeRight_entered(const QModelIndex &index)
+{
+    if (index.isValid()) {
+        setActiveTreeview(ui->treeRight);
+        setActiveModel(model_right);
+    }
+}
+
+/**
+ * @brief MainWindow::on_action_About_Denka_Commander_triggered
+ * Show an about box
+ */
+void MainWindow::on_action_About_Denka_Commander_triggered()
+{
+    QMessageBox::information(this, "About", "<b>Denka Commander</b><br>A "
+        "system navigator based on Midnight Commander"
+        "<br>By <b>DenkaTech</b> (Danny Van Geyte)<br>"
+        "Copyright(c) 2021");
+}
+
+void MainWindow::on_actionAbout_Qt5_triggered()
+{
+    QApplication::aboutQt();
+}
+
+/**
+ * @brief MainWindow::on_action_Options_triggered
+ * Open options form
+ */
+void MainWindow::on_action_Options_triggered()
+{
+    ExtensionsEditor ed(this);
+    int res = ed.exec();
+    qDebug() << " RES = " << res;
+
 }
