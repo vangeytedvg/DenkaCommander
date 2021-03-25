@@ -286,11 +286,13 @@ void MainWindow::saveSettings() {
     QSettings settings("DenkaTech","Denka Commander");
     settings.beginGroup("MainWindow");
     settings.setValue("form/geometry", saveGeometry());
+    settings.setValue("form/settings", this->saveState());
     settings.endGroup();
     settings.beginGroup("Navigators");
     settings.setValue("nav/treeleft", ui->treeLeft->header()->saveState());
     settings.setValue("nav/treeright", ui->treeRight->header()->saveState());
     settings.endGroup();
+
 }
 
 /**
@@ -310,6 +312,8 @@ void MainWindow::readSettings() {
     } else {
         restoreGeometry(geometry);
     }
+    const QByteArray settingsF = settings.value("form/settings", QByteArray()).toByteArray();
+    restoreState(settingsF);
     settings.endGroup();
     // Restore the configuration of the treeviews
     settings.beginGroup("Navigators");
@@ -318,6 +322,7 @@ void MainWindow::readSettings() {
     const QByteArray treeright = settings.value("nav/treeright", QByteArray()).toByteArray();
     ui->treeRight->header()->restoreState(treeright);
     settings.endGroup();
+
 }
 
 /**
