@@ -16,6 +16,7 @@
 #include <QDesktopWidget>
 #include <QDesktopServices>
 #include <QPoint>
+#include <QPropertyAnimation>
 #include "renamewindow.h"
 #include "mkdirwindow.h"
 #include "codeeditor.h"
@@ -48,6 +49,8 @@ public:
 
     bool getCanClose() const;
     void setCanClose(bool value);
+    void showErrorMessageBox(QString theMessage);
+    void hideErrorMessageBox();
 
 private slots:
     void on_actionE_xit_triggered();
@@ -68,6 +71,8 @@ private slots:
     void on_action_About_Denka_Commander_triggered();
     void on_actionAbout_Qt5_triggered();
     void on_action_Options_triggered();
+    void on_actionMove_triggered();
+    void on_toolButton_CloseErrorBox_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -97,6 +102,8 @@ private:
     QList<QString> extensions;
     void verifySelection();
     bool canClose;
+    QPropertyAnimation *animateHeight;
+    bool animatedErrorVisible = false;
 
 protected:
     void closeEvent(QCloseEvent *event) override;

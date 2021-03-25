@@ -26,5 +26,6 @@
         <file>cut.png</file>
         <file>copytext.png</file>
         <file>diskette.png</file>
+        <file>moving-truck.png</file>
     </qresource>
 </RCC>

@@ -5,7 +5,6 @@
 #include <QMessageBox>
 #include <QTextStream>
 #include "codeeditor.h"
-
 #define FILENOTFOUND -1
 #define FILENAMENOTSET = -2
 #define FILENORMAL = 1

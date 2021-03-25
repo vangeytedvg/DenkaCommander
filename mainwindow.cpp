@@ -76,6 +76,7 @@ void MainWindow::addExtensions()
     extensions.append("cs");
     extensions.append("xml");
     extensions.append("json");
+    extensions.append("css");
 }
 
 bool MainWindow::isInVector(QString extension)
@@ -122,6 +123,33 @@ bool MainWindow::getCanClose() const
 void MainWindow::setCanClose(bool value)
 {
     canClose = value;
+}
+
+/**
+ * @brief MainWindow::showErrorMessageBox
+ * Show a nice error message
+ * @param theMessage
+ */
+void MainWindow::showErrorMessageBox(QString theMessage)
+{
+    ui->label_Error->setText(theMessage);
+    // Make it look nice when the error appears.
+    animateHeight = new QPropertyAnimation(ui->frame_Error, "maximumHeight");
+    animateHeight->setDuration(200);
+    animateHeight->setStartValue(0);
+    animateHeight->setEndValue(60);
+    animateHeight->start();
+    animatedErrorVisible = true;
+}
+
+void MainWindow::hideErrorMessageBox()
+{
+    animateHeight = new QPropertyAnimation(ui->frame_Error, "maximumHeight");
+    animateHeight->setDuration(200);
+    animateHeight->setStartValue(60);
+    animateHeight->setEndValue(0);
+    animateHeight->start();
+    animatedErrorVisible = false;
 }
 
 /**
@@ -738,4 +766,44 @@ void MainWindow::on_action_Options_triggered()
     int res = ed.exec();
     qDebug() << " RES = " << res;
 
+}
+
+/**
+ * @brief MainWindow::on_actionMove_triggered
+ * Move a file/folder to a new location.  This is done
+ * by renaming the file/folder!
+ */
+void MainWindow::on_actionMove_triggered()
+{
+    QModelIndex leftIndex = ui->treeLeft->currentIndex();
+    QModelIndex rightIndex = ui->treeRight->currentIndex();
+    if (leftIndex.isValid() && rightIndex.isValid()) {
+        if (animatedErrorVisible) {
+            hideErrorMessageBox();
+        }
+        QString leftPath = this->model_left->fileInfo(leftIndex).absoluteFilePath();
+        QString rightPath = this->model_right->fileInfo(rightIndex).absoluteFilePath();
+        QString newFileName = rightPath + QDir::separator() + this->model_left->fileInfo(leftIndex).baseName();
+        QMessageBox::StandardButton answer;
+        answer = QMessageBox::information(this, "Move",
+                        "Move?", QMessageBox::Yes|QMessageBox::No);
+        if (answer == QMessageBox::No) {
+            return;
+        }
+        // Rename the file / Folder (this actually moves it)
+        QFile fileToRename(leftPath);
+        fileToRename.rename(newFileName);
+    } else {
+
+        showErrorMessageBox("Please select a file/folder on the left and a folder on the right!");
+    }
+}
+
+/**
+ * @brief MainWindow::on_toolButton_CloseErrorBox_clicked
+ * Button to close the error label messagebox frame
+ */
+void MainWindow::on_toolButton_CloseErrorBox_clicked()
+{
+    hideErrorMessageBox();
 }

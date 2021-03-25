@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>329</width>
+    <width>200</width>
     <height>406</height>
    </rect>
   </property>
   <property name="maximumSize">
    <size>
-    <width>329</width>
+    <width>200</width>
     <height>16777215</height>
    </size>
   </property>
@@ -41,7 +41,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Extensions to handle by the internal viewer</string>
+      <string>Extensions</string>
      </property>
     </widget>
    </item>
