@@ -167,7 +167,7 @@ void MainWindow::setupAdditionalUI() {
     // Add a progress bar to the statusbar...
     QLabel *sliderLabel = new QLabel("Icon size");
     f = new QSlider();
-    f->setMaximum(60);
+    f->setMaximum(120);
     f->setOrientation(Qt::Horizontal);
     f->setMinimumWidth(40);
     f->setTickInterval(5);
@@ -562,6 +562,7 @@ void MainWindow::on_treeLeft_clicked(const QModelIndex &index)
     if (index.isValid()) {
         setActiveTreeview(ui->treeLeft);
         setActiveModel(model_left);
+        f->setValue(ui->treeLeft->iconSize().height());
     }
     verifySelection();
 
@@ -578,6 +579,7 @@ void MainWindow::on_treeRight_clicked(const QModelIndex &index)
     if (index.isValid()) {
         setActiveTreeview(ui->treeRight);
         setActiveModel(model_right);
+        f->setValue(ui->treeRight->iconSize().height());
     }
     verifySelection();
 }
