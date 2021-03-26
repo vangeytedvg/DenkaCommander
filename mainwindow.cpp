@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
     /* Left side browser */
     model_left = new QFileSystemModel();
     model_left->setRootPath(QDir::rootPath());
+    model_left->setFilter(QDir::AllEntries|QDir::Hidden);
 
     /* Context menu for treeLeft */
     ui->treeLeft->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -71,7 +72,7 @@ void MainWindow::on_actionE_xit_triggered()
 void MainWindow::addExtensions()
 {
     /* Open the extensions.txt file and read it in */
-    QFile myFile("extensions.txt");
+    QFile myFile("./extensions.txt");
     // clear all items before reading file (avoid doubles)
     extensions.clear();
     if (!myFile.open(QIODevice::ReadOnly | QFile::Text)) {
@@ -335,15 +336,11 @@ void MainWindow::readSettings() {
     settings.beginGroup("Navigators");
     const QByteArray treeleft = settings.value("nav/treeleft", QByteArray()).toByteArray();
     QSize treelefttsg = settings.value("nav/treeleftsg").toSize();
-    ui->treeLeft->setIconSize(QSize(treelefttsg));
-    qDebug() << treelefttsg;
-
+    ui->treeLeft->setIconSize(QSize(treelefttsg));  
     ui->treeLeft->header()->restoreState(treeleft);
     const QByteArray treeright = settings.value("nav/treeright", QByteArray()).toByteArray();
     QSize treerightsg = settings.value("nav/treerightsg").toSize();
     ui->treeRight->setIconSize(QSize(treerightsg));
-
-    qDebug() << treerightsg;
     ui->treeRight->header()->restoreState(treeright);
     settings.endGroup();
 
@@ -779,7 +776,7 @@ void MainWindow::on_action_About_Denka_Commander_triggered()
     QMessageBox::information(this, "About", "<b>Denka Commander</b><br>A "
         "system navigator based on Midnight Commander"
         "<br>By <b>DenkaTech</b> (Danny Van Geyte)<br>"
-        "Copyright(c) 2021");
+        "Copyright(c) 2021 <b>V1.0.4</b>");
 }
 
 void MainWindow::on_actionAbout_Qt5_triggered()
