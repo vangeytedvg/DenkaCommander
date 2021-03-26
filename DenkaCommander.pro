@@ -48,6 +48,16 @@ RESOURCES += \
     qdarkstyle/style.qrc \
     qdarkstyle/style.qrc
 
+#QUAZIPCODEDIR = "/home/danny/Development/compressor/quazip-1.1/quazip"
+#ZLIPCODEDIR = "/home/danny/Development/compressor/Libs"
+#unix {
+#    LIBS += -L$${ZLIBCODEDIR} -lz
+#}
+
+#INCLUDEPATH += $${QUAZIPCODEDIR}
+#HEADERS += $${QUAZIPCODEDIR}/*.h
+#SOURCES += $${QUAZIPCODEDIR}/*.cpp
+#SOURCES += $${QUAZIPCODEDIR}/*.h
 
 DISTFILES += \
     qdarkstyle/rc/arrow_down.png \

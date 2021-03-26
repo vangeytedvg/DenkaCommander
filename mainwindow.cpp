@@ -6,16 +6,19 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    /* Read the settings for the application */
+    readSettings();
+    canClose=true;
     currentPath.clear();
     setWindowTitle("Denka Commander");
-    // Left side browser
+
+    /* Left side browser */
     model_left = new QFileSystemModel();
     model_left->setRootPath(QDir::rootPath());
 
-    // Context menu for treeLeft
+    /* Context menu for treeLeft */
     ui->treeLeft->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->treeLeft, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
-
     ui->treeLeft->setModel(model_left);
     ui->treeLeft->setRootIndex(model_left->index("home"));
     ui->treeLeft->expandRecursively(QModelIndex(model_left->index(0)));
@@ -23,29 +26,28 @@ MainWindow::MainWindow(QWidget *parent)
     model_left->sort(0, Qt::AscendingOrder);
     ui->treeLeft->setCurrentIndex(model_left->index(0));
 
-    // Right side browser
-    // Context menu for treeRight
+    /* Right side browser */
+    /* Context menu for treeRight */
     ui->treeRight->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->treeRight, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
-
-
     model_right = new QFileSystemModel();
     model_right->setRootPath(QDir::homePath());
     ui->treeRight->setModel(model_right);
     model_right->sort(0, Qt::AscendingOrder);
     ui->treeRight->setRootIndex(model_right->index(QDir::homePath()));
-    readSettings();
+
     setActiveModel(NULL);
     setActiveTreeview(ui->treeLeft);
+    setupAdditionalUI();
     addExtensions();
-
-    // Pfew this took some time to make this work
-    connect(ui->treeLeft->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
-    connect(ui->treeRight->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
-
     ed = new Editor(this);
+    /* SIGNALS AND SLOTS */
+    connect(ui->treeLeft, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
+//    connect(ui->treeLeft->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
+//    connect(ui->treeRight->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
+    connect(ui->treeRight, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
+    // Pfew this took some time to make this work
     connect(ed, SIGNAL(texthasChanged(bool)), this, SLOT(onChildTextChanged(bool)));
-    canClose=true;
+
 }
 
 MainWindow::~MainWindow()
@@ -63,20 +65,26 @@ void MainWindow::on_actionE_xit_triggered()
 
 /**
  * @brief MainWindow::addExtensions
- * The extensions vector contains the extensions the
+ * The extensions list contains the extensions the
  * internal editor will handle
  */
 void MainWindow::addExtensions()
 {
-    extensions.append("txt");
-    extensions.append("py");
-    extensions.append("js");
-    extensions.append("cpp");
-    extensions.append("sh");
-    extensions.append("cs");
-    extensions.append("xml");
-    extensions.append("json");
-    extensions.append("css");
+    /* Open the extensions.txt file and read it in */
+    QFile myFile("extensions.txt");
+    // clear all items before reading file (avoid doubles)
+    extensions.clear();
+    if (!myFile.open(QIODevice::ReadOnly | QFile::Text)) {
+        QMessageBox::warning(this,"Extensions settings", "Can not open extensions.txt!");
+        return;
+    }
+    QTextStream in(&myFile);
+    while (!in.atEnd()) {
+        QString contents = in.readLine();
+        // Add to the qlist
+        extensions.append(contents);
+    }
+    myFile.close();
 }
 
 bool MainWindow::isInVector(QString extension)
@@ -153,24 +161,29 @@ void MainWindow::hideErrorMessageBox()
 }
 
 /**
- * @brief MainWindow::on_TreeSelectionChanged
- * Keep track of what element is selected in the treeviews
- * @param current
- * @param previous
- */
-void MainWindow::on_TreeSelectionChanged(const QModelIndex &current, const QModelIndex &previous) {
-}
-
-/**
  * @brief MainWindow::setupAdditionalUI
  */
 void MainWindow::setupAdditionalUI() {
     // Add a progress bar to the statusbar...
-    this->statusProgress = new QProgressBar();
-    this->statusProgress->setMaximum(100);
-    this->statusProgress->setMaximumWidth(100);
-    ui->statusbar->addPermanentWidget(this->statusProgress);
-    this->statusProgress->setValue(0);
+    QLabel *sliderLabel = new QLabel("Icon size");
+    f = new QSlider();
+    f->setMaximum(60);
+    f->setOrientation(Qt::Horizontal);
+    f->setMinimumWidth(40);
+    f->setTickInterval(5);
+    f->setMaximumWidth(40);
+    f->setSingleStep(5);
+    f->setMinimum(16);
+    f->setValue(32);
+    f->show();
+    ui->toolBar_Sizer->addWidget(sliderLabel);
+    ui->toolBar_Sizer->addWidget(f);
+    connect(f, SIGNAL(valueChanged(int)), this, SLOT(onIconSizeChange(int)));
+}
+
+void MainWindow::onIconSizeChange(int) {
+    QSize t(f->value(), f->value());
+    ActiveTreeview()->setIconSize(t);
 }
 
 /**
@@ -217,6 +230,7 @@ void MainWindow::setSelectedTreeRow(int value)
  */
 void MainWindow::closeEvent(QCloseEvent *event) {    
     saveSettings();
+    event->accept();
 }
 
 /**
@@ -290,7 +304,9 @@ void MainWindow::saveSettings() {
     settings.endGroup();
     settings.beginGroup("Navigators");
     settings.setValue("nav/treeleft", ui->treeLeft->header()->saveState());
+    settings.setValue("nav/treeleftsg", ui->treeLeft->iconSize());
     settings.setValue("nav/treeright", ui->treeRight->header()->saveState());
+    settings.setValue("nav/treerightsg", ui->treeRight->iconSize());
     settings.endGroup();
 
 }
@@ -318,8 +334,16 @@ void MainWindow::readSettings() {
     // Restore the configuration of the treeviews
     settings.beginGroup("Navigators");
     const QByteArray treeleft = settings.value("nav/treeleft", QByteArray()).toByteArray();
+    QSize treelefttsg = settings.value("nav/treeleftsg").toSize();
+    ui->treeLeft->setIconSize(QSize(treelefttsg));
+    qDebug() << treelefttsg;
+
     ui->treeLeft->header()->restoreState(treeleft);
     const QByteArray treeright = settings.value("nav/treeright", QByteArray()).toByteArray();
+    QSize treerightsg = settings.value("nav/treerightsg").toSize();
+    ui->treeRight->setIconSize(QSize(treerightsg));
+
+    qDebug() << treerightsg;
     ui->treeRight->header()->restoreState(treeright);
     settings.endGroup();
 
@@ -769,8 +793,9 @@ void MainWindow::on_action_Options_triggered()
 {
     ExtensionsEditor ed(this);
     int res = ed.exec();
-    qDebug() << " RES = " << res;
-
+    if (res == 0) {
+        addExtensions();
+    }
 }
 
 /**

@@ -36,17 +36,12 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
     QTreeView *ActiveTreeview() const;
-
     void setActiveTreeview(QTreeView *ActiveTreeview);
-
     QFileSystemModel *getActiveModel() const;
     void setActiveModel(QFileSystemModel *value);
-
     int getSelectedTreeRow() const;
     void setSelectedTreeRow(int value);
-
     bool getCanClose() const;
     void setCanClose(bool value);
     void showErrorMessageBox(QString theMessage);
@@ -59,7 +54,6 @@ private slots:
     void on_actionCopy_directory_triggered();
     void on_treeLeft_clicked(const QModelIndex &index);
     void on_treeRight_clicked(const QModelIndex &index);
-    void on_TreeSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
     void on_action_Open_triggered();
     void on_actionRename_triggered();
     void on_actionMkdir_triggered();
@@ -74,35 +68,39 @@ private slots:
     void on_actionMove_triggered();
     void on_toolButton_CloseErrorBox_clicked();
 
+public slots:
+    void onIconSizeChange(int);
+
 private:
     Ui::MainWindow *ui;
     QString currentPath = "";
     QFileSystemModel *model_left;
     QFileSystemModel *model_right;
     QFileSystemModel *activeModel;
-    QProgressDialog *progress;
-    int selectedTreeRow = 0;
+    QProgressDialog *progress;    
+    QProgressBar *statusProgress;
+    QTreeView *m_ActiveTreeview;
+    QString m_Tree;
+    QList<QString> extensions;
+    QPropertyAnimation *animateHeight;
+    QSlider *f;
     Editor *ed;
     RenameWindow *renameWindow;
-    MkdirWindow *mkdirWindow;
+    MkdirWindow *mkdirWindow;  
     void copyFolder(QString sourceFolder, QString destFolder);
     void readSettings();
     void saveSettings();
     void setupAdditionalUI();
+    void addExtensions();
+    bool isInVector(QString extension);
     void countFilesInFolder(const QString &path);
     bool renameDir(const QString &oldName, const QString &newName);
-    QProgressBar *statusProgress;
-    QTreeView *m_ActiveTreeview;
-    QString m_Tree;
+    void verifySelection();
+    int selectedTreeRow = 0;
     long m_totalNrOfFiles = 0;
     long m_filesCopied = 0;
     long m_totalCopied = 0;
-    void addExtensions();
-    bool isInVector(QString extension);
-    QList<QString> extensions;
-    void verifySelection();
     bool canClose;
-    QPropertyAnimation *animateHeight;
     bool animatedErrorVisible = false;
 
 protected:
