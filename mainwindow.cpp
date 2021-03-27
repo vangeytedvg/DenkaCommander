@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -840,5 +841,17 @@ void MainWindow::on_toolButton_CloseErrorBox_clicked()
 void MainWindow::on_actionTerminal_triggered()
 {
     // Crazy stuff to simply open a terminal window, but it works
-    system("xterm -e sh -c 'cd /home/danny; exec bash'");
+    if (ActiveTreeview() != nullptr) {
+        QModelIndex selectedIndex = ActiveTreeview()->currentIndex();
+        QString thePath = activeModel->fileInfo(selectedIndex).absoluteFilePath();
+        QFileInfo t(thePath);
+        if (t.isDir()) {
+            // Looks a bit special on how I replace this @ with the actual path,
+            // but concatenating did'nt work
+            QString exectr = "xterm -e sh -c 'cd @; exec bash'";
+            exectr.replace("@", thePath);
+            qDebug() << exectr;
+            system(exectr.toStdString().c_str());
+        }
+    }
 }
