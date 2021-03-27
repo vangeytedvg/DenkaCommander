@@ -613,6 +613,7 @@ border-radius:  5px;</string>
     <addaction name="actionMove"/>
     <addaction name="actionDelete"/>
     <addaction name="separator"/>
+    <addaction name="actionTerminal"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -626,7 +627,6 @@ border-radius:  5px;</string>
      <string>&amp;Tools</string>
     </property>
     <addaction name="action_Options"/>
-    <addaction name="actionTerminal"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Tree"/>
@@ -804,8 +804,11 @@ border-radius:  5px;</string>
    </property>
   </action>
   <action name="actionTerminal">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
-    <string>Terminal</string>
+    <string>Open Terminal here</string>
    </property>
   </action>
  </widget>

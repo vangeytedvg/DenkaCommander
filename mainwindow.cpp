@@ -44,10 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     ed = new Editor(this);
     /* SIGNALS AND SLOTS */
     connect(ui->treeLeft, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
-//    connect(ui->treeLeft->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
-//    connect(ui->treeRight->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(on_TreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
     connect(ui->treeRight, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customMenuRequested(QPoint)));
-    // Pfew this took some time to make this work
     connect(ed, SIGNAL(texthasChanged(bool)), this, SLOT(onChildTextChanged(bool)));
 
 }
@@ -269,6 +266,7 @@ void MainWindow::customMenuRequested(QPoint pos)
     menu->addAction(deleteFileOrFolder);
     menu->addAction(openFile);
     menu->addAction(mkDir);
+    menu->addAction(ui->actionTerminal);
     // connect signals and slots
     connect(renameFileOrFolder, SIGNAL(triggered()), this, SLOT(on_actionRename_triggered()));
     connect(copyFileOrFolder, SIGNAL(triggered()), this, SLOT(on_actionCopy_directory_triggered()));
@@ -558,6 +556,7 @@ void MainWindow::copyFolder(QString sourceFolder, QString destFolder)
 void MainWindow::on_treeLeft_clicked(const QModelIndex &index)
 {
     if (index.isValid()) {
+        ui->actionTerminal->setEnabled(true);
         setActiveTreeview(ui->treeLeft);
         setActiveModel(model_left);
         f->setValue(ui->treeLeft->iconSize().height());
@@ -575,9 +574,11 @@ void MainWindow::on_treeLeft_clicked(const QModelIndex &index)
 void MainWindow::on_treeRight_clicked(const QModelIndex &index)
 {
     if (index.isValid()) {
+        ui->actionTerminal->setEnabled(true);
         setActiveTreeview(ui->treeRight);
         setActiveModel(model_right);
         f->setValue(ui->treeRight->iconSize().height());
+
     }
     verifySelection();
 }
@@ -751,18 +752,27 @@ void MainWindow::onChildTextChanged(bool state)
 }
 
 
-
+/**
+ * @brief MainWindow::on_treeLeft_entered
+ * @param index
+ */
 void MainWindow::on_treeLeft_entered(const QModelIndex &index)
 {
     if (index.isValid()) {
+        ui->actionTerminal->setEnabled(true);
         setActiveTreeview(ui->treeLeft);
         setActiveModel(model_left);
     }
 }
 
+/**
+ * @brief MainWindow::on_treeRight_entered
+ * @param index
+ */
 void MainWindow::on_treeRight_entered(const QModelIndex &index)
 {
     if (index.isValid()) {
+        ui->actionTerminal->setEnabled(true);
         setActiveTreeview(ui->treeRight);
         setActiveModel(model_right);
     }
@@ -838,20 +848,26 @@ void MainWindow::on_toolButton_CloseErrorBox_clicked()
     hideErrorMessageBox();
 }
 
+/**
+ * @brief MainWindow::on_actionTerminal_triggered
+ * Open selected folder
+ */
 void MainWindow::on_actionTerminal_triggered()
 {
     // Crazy stuff to simply open a terminal window, but it works
-    if (ActiveTreeview() != nullptr) {
+    if (this->ActiveTreeview()) {
         QModelIndex selectedIndex = ActiveTreeview()->currentIndex();
         QString thePath = activeModel->fileInfo(selectedIndex).absoluteFilePath();
         QFileInfo t(thePath);
         if (t.isDir()) {
             // Looks a bit special on how I replace this @ with the actual path,
             // but concatenating did'nt work
-            QString exectr = "xterm -e sh -c 'cd @; exec bash'";
+            QString exectr = "konsole -e sh -c 'cd @; exec bash'";
             exectr.replace("@", thePath);
             qDebug() << exectr;
             system(exectr.toStdString().c_str());
+        } else {
+            showErrorMessageBox("Selection is not a folder, cannot open terminal.  Please select a folder!");
         }
     }
 }
