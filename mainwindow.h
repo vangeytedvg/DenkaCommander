@@ -21,6 +21,7 @@
 #include "mkdirwindow.h"
 #include "codeeditor.h"
 #include "extensionseditor.h"
+#include <QProcess>
 
 #define DIALOGRESULTOK 1
 #define DIALOGRESULTCANCEL 0
@@ -67,6 +68,8 @@ private slots:
     void on_action_Options_triggered();
     void on_actionMove_triggered();
     void on_toolButton_CloseErrorBox_clicked();
+
+    void on_actionTerminal_triggered();
 
 public slots:
     void onIconSizeChange(int);

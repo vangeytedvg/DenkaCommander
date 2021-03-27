@@ -836,3 +836,9 @@ void MainWindow::on_toolButton_CloseErrorBox_clicked()
 {
     hideErrorMessageBox();
 }
+
+void MainWindow::on_actionTerminal_triggered()
+{
+    // Crazy stuff to simply open a terminal window, but it works
+    system("xterm -e sh -c 'cd /home/danny; exec bash'");
+}
