@@ -58,6 +58,7 @@ private slots:
     void on_action_Open_triggered();
     void on_actionRename_triggered();
     void on_actionMkdir_triggered();
+    void on_Execute_triggered();
     void on_actionDelete_triggered();
     void onChildTextChanged(bool state);
     void customMenuRequested(QPoint pos);

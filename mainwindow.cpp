@@ -264,6 +264,7 @@ void MainWindow::customMenuRequested(QPoint pos)
     QAction *deleteFileOrFolder = new QAction("Delete", this);
     QAction *openFile = new QAction("Open", this);
     QAction *mkDir = new QAction("Mkdir", this);
+    QAction *executeProgram = new QAction("Execute program...", this);
     // Add custom menu actions
     menu->addAction(copyFileOrFolder);
     menu->addAction(renameFileOrFolder);
@@ -271,10 +272,18 @@ void MainWindow::customMenuRequested(QPoint pos)
     menu->addAction(openFile);
     menu->addAction(mkDir);
     menu->addAction(ui->actionTerminal);
+    menu->addAction(executeProgram);
+    /* Check if we can open terminal or execute the selection */
     if (QFileInfo(thePath).isFile()) {
-       ui->actionTerminal->setEnabled(false);
+        ui->actionTerminal->setEnabled(false);
+        if (QFileInfo(thePath).isExecutable()) {
+            executeProgram->setEnabled(true);
+        } else {
+            executeProgram->setEnabled(false);
+        }
     } else if (QFileInfo(thePath).isDir()) {
-       ui->actionTerminal->setEnabled(true);
+        ui->actionTerminal->setEnabled(true);
+        executeProgram->setEnabled(false);
     }
     // connect signals and slots
     connect(renameFileOrFolder, SIGNAL(triggered()), this, SLOT(on_actionRename_triggered()));
@@ -282,6 +291,7 @@ void MainWindow::customMenuRequested(QPoint pos)
     connect(deleteFileOrFolder, SIGNAL(triggered()), this, SLOT(on_actionDelete_triggered()));
     connect(openFile, SIGNAL(triggered()), this, SLOT(on_action_Open_triggered()));
     connect(mkDir, SIGNAL(triggered()), this, SLOT(on_actionMkdir_triggered()));
+    connect(executeProgram, SIGNAL(triggered()), this, SLOT(on_Execute_triggered()));
     // Do some housekeeping based on the type of file
     QString filePath = activeModel->fileInfo(index).absoluteFilePath();
     QFileInfo pathInfo(filePath);
@@ -718,6 +728,24 @@ void MainWindow::on_actionMkdir_triggered()
 }
 
 /**
+ * @brief MainWindow::on_Execute_triggered
+ * Execute the selection if it is an executable
+ */
+void MainWindow::on_Execute_triggered()
+{
+    QProcess *proc = new QProcess();
+    QModelIndex selectedIndex = m_ActiveTreeview->currentIndex();
+    QString thePath = activeModel->fileInfo(selectedIndex).absoluteFilePath();
+    QFileInfo fi(thePath);
+    if (fi.isExecutable()) {
+        QString params = "";
+        proc->start(thePath, QStringList() << params);
+    } else {
+        showErrorMessageBox("Your selection is not an executable file!");
+    }
+}
+
+/**
  * @brief MainWindow::on_actionDelete_triggered
  * Remove the selected file/folder
  */
@@ -796,7 +824,7 @@ void MainWindow::on_action_About_Denka_Commander_triggered()
     QMessageBox::information(this, "About", "<b>Denka Commander</b><br>A "
         "system navigator based on Midnight Commander"
         "<br>By <b>DenkaTech</b> (Danny Van Geyte)<br>"
-        "Copyright(c) 2021 <b>V1.0.4</b>");
+        "Copyright(c) 2021 <b>V1.0.5.26032021</b>");
 }
 
 void MainWindow::on_actionAbout_Qt5_triggered()
