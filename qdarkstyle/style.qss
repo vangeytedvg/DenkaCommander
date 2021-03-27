@@ -364,7 +364,7 @@ QRadioButton::indicator:checked:disabled {
 /* QMenuBar ---------------------------------------------------------------
 
 https://doc.qt.io/qt-5/stylesheet-examples.html#customizing-qmenubar
-
+// 
 --------------------------------------------------------------------------- */
 QMenuBar {
   background-color: #242322;
@@ -403,7 +403,7 @@ https://doc.qt.io/qt-5/stylesheet-examples.html#customizing-qmenu
 
 --------------------------------------------------------------------------- */
 QMenu {
-  border: 0px solid #242322;
+  border: 2px solid #242322;
   color: #F0F0F0;
   margin: 0px;
 }

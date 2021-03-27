@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
     model_right->sort(0, Qt::AscendingOrder);
     ui->treeRight->setRootIndex(model_right->index(QDir::homePath()));
 
-    setActiveModel(NULL);
+    setActiveModel(nullptr);
     setActiveTreeview(ui->treeLeft);
     setupAdditionalUI();
     addExtensions();
@@ -253,7 +253,11 @@ void MainWindow::setActiveModel(QFileSystemModel *value)
 
 void MainWindow::customMenuRequested(QPoint pos)
 {
+    if (activeModel == nullptr) {
+        return;
+    }
     QModelIndex index = this->ActiveTreeview()->indexAt(pos);
+    QString thePath = activeModel->fileInfo(index).absoluteFilePath();
     QMenu *menu = new QMenu(this);
     QAction *copyFileOrFolder = new QAction("Copy", this);
     QAction *renameFileOrFolder = new QAction("Rename", this);
@@ -267,6 +271,11 @@ void MainWindow::customMenuRequested(QPoint pos)
     menu->addAction(openFile);
     menu->addAction(mkDir);
     menu->addAction(ui->actionTerminal);
+    if (QFileInfo(thePath).isFile()) {
+       ui->actionTerminal->setEnabled(false);
+    } else if (QFileInfo(thePath).isDir()) {
+       ui->actionTerminal->setEnabled(true);
+    }
     // connect signals and slots
     connect(renameFileOrFolder, SIGNAL(triggered()), this, SLOT(on_actionRename_triggered()));
     connect(copyFileOrFolder, SIGNAL(triggered()), this, SLOT(on_actionCopy_directory_triggered()));
@@ -864,7 +873,6 @@ void MainWindow::on_actionTerminal_triggered()
             // but concatenating did'nt work
             QString exectr = "konsole -e sh -c 'cd @; exec bash'";
             exectr.replace("@", thePath);
-            qDebug() << exectr;
             system(exectr.toStdString().c_str());
         } else {
             showErrorMessageBox("Selection is not a folder, cannot open terminal.  Please select a folder!");
